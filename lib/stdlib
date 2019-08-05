@@ -61,7 +61,7 @@ do_depend () {
 
 # Generic do_tar, based on do_list
 do_tar () {
-	tar -cf - $(do_list)
+	( cd "$DIR_TREE" ; tar -cf - $(do_list) )
 }
 
 # Generic do_tgz, based on do_tar, do_list

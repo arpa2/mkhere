@@ -41,7 +41,7 @@ do_build () {
 
 do_list () {
 	cd "$DIR_TREE"
-	find . | sed 's+^\./++'
+	find . -type f | sed 's+^\./++'
 }
 
 do_variants () {
