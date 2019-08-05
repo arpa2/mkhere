@@ -71,7 +71,7 @@ do_tgz () {
 
 # Generic do_cpio, based on do_list
 do_cpio () {
-	do_list | ( cd "$DIR_TREE" ; cpio -o )
+	do_list | ( cd "$DIR_TREE" ; cpio -H newc -o )
 }
 
 # Generic do_cpiogz, based on do_cpio, do_list

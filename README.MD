@@ -63,6 +63,15 @@ Normally, you will want to update software manually,
 /path/to/mkhere/xxx.sh update
 ```
 
+Similarly, you would want to install build dependencies manually onto
+the build system,
+
+```
+/path/to/mkhere/xxx.sh dependencies | less
+#then#
+/path/to/mkhere/xxx.sh depend
+```
+
 However, you will always want to build automatically, but only if needed, as part of a script,
 
 ```

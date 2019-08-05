@@ -36,6 +36,9 @@ do_build () {
 		empty_dir "$DIR_TREE" && \
 		make DESTDIR="$DIR_TREE" install && \
 		find "$DIR_TREE/usr/lib" -name \*.la -exec rm {} \; && \
+		find "$DIR_TREE/usr/lib" -name \*.so* -type f -exec strip {} \; && \
+		find "$DIR_TREE/usr/bin" -type f | grep -v twstart | while read FILE ; do strip $FILE ; done && \
+		rm "$DIR_TREE/usr/bin/"{twcuckoo,twclutter,twdialog,twthreadtest} && \
 		rm "$DIR_TREE/usr/bin/twin" && \
 		ln -s twin_server "$DIR_TREE/usr/bin/twin"
 	fi
