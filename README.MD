@@ -54,3 +54,43 @@ there barely ought to be anything.
 
 The whole build system checks into a Git repository that can be shared
 across platforms.
+
+## Average Use
+
+Normally, you will want to update software manually,
+
+```
+/path/to/mkhere/xxx.sh update
+```
+
+However, you will always want to build automatically, but only if needed, as part of a script,
+
+```
+/path/to/mkhere/xxx.sh build
+```
+
+While working on the script containing this, if it fails, you can manually go back after downgrading the build, and possibly even build it on the spot,
+
+```
+/path/to/mkhere/xxx.sh touch
+#or#
+/path/to/mkhere/xxx.sh touch build
+```
+
+Once you have the results built, you can export the results,
+
+```
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpiogz
+```
+
+You can line this up as your `initrd=` image for a kernel, or you could ask for a tar ball to unzip on the spot,
+
+```
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh tar | tar -xvf -
+```
+
+It is intentional that most of the actions above constitute exactly one command.
+
+As for the `/path/to`, we are sure you have a taste about ways of setting
+this path.  Include it into your package's configuration and export as an
+environment variable, for instance.
