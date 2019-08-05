@@ -1,0 +1,101 @@
+# standard library for "make here" build scripts
+#
+# Normal usage pattern from a mkhere/xxx.sh
+#
+#	TARGET=xxx
+#	. $(dirname "$0")/lib/stdlib
+
+
+# Set debugging macros
+if [ -n "$DEBUG" ]
+then
+	debug () { echo >&2 "$@"; }
+else
+	debug () { echo -n ''; }
+fi
+
+# Derive $TARGET and ensure its rootfs
+TARGET=$(basename "$0")
+TARGET=${TARGET%.sh}
+if [ "$0" != "/mkhere/$TARGET.sh" ]
+then
+	NEWROOT=$(dirname "$0")/..
+	debug Changing to build rootfs $NEWROOT
+	exec chroot "$NEWROOT" /mkhere/$TARGET.sh "$@"
+fi
+
+# Derive variables $VARIANT and $FLAVOUR
+VARIANT=${VARIANT_${TARGET}}  #TODO#
+FLAVOUR=${FLAVOUR_${TARGET}}  #TODO#
+debug Script target is $TARGET, variant is $VARIANT, flavour is $FLAVOUR
+
+# Derive DIR_SRC, DIR_GIT, DIR_BUILD, DIR_TREE and have them
+DIR_FETCH=/dl/${TARGET}
+DIR_SRC=/src/${TARGET}
+DIR_GIT=${DIR_SRC}/${TARGET}.git
+DIR_BUILD=/build/${TARGET}${VARIANT:+-${VARIANT}}
+DIR_TREE=/tree/${TARGET}${VARIANT:+-${VARIANT}}
+mkdir -p "${DIR_TREE}" "${DIR_BUILD}" "${DIR_SRC}" "${DIR_FETCH}"
+
+# Utility to erase a directory somewhat safely
+empty_dir () {
+	EMPTY_DIR=${1:-$PWD}
+	case "$EMPTY_DIR" in
+	"$DIR_TREE"|"$DIR_SRC"|"$DIR_BUILD"|"$DIR_TREE")
+		rm -rf "$EMPTY_DIR/"*
+		;;
+	"$DIR_TREE"/*|"$DIR_SRC"/*|"$DIR_BUILD"/*|"$DIR_TREE"/*)
+		rm -rf "$EMPTY_DIR"
+		;;
+	*)
+		echo >&2 "Protecting you from: empty_dir \"$EMPTY_DIR\""
+		exit 1
+		;;
+	esac
+}
+
+# Generic subcommand for installing dependencies
+do_depend () {
+	apt -y install $(do_dependencies)
+}
+
+# Generic do_tar, based on do_list
+do_tar () {
+	tar -cf - $(do_list)
+}
+
+# Generic do_tgz, based on do_tar, do_list
+do_tgz () {
+	do_tar | gzip --best
+}
+
+# Generic do_cpio, based on do_list
+do_cpio () {
+	do_list | ( cd "$DIR_TREE" ; cpio -o )
+}
+
+# Generic do_cpiogz, based on do_cpio, do_list
+do_cpiogz () {
+	do_cpio | gzip --best
+}
+
+# Main programming, running the commands in argv[]
+main_do_commands () {
+	if [ "$#" -eq 0 ]
+	then
+		echo >&2 "Please supply one or more subcommands to $0"
+		exit 1
+	fi
+	for TODO in "$@"
+	do
+		"do_$TODO"
+		EXITCODE=$?
+		if [ $EXITCODE -ne 0 ]
+		then
+			echo >&2 "$TARGET $TODO failed with exit code $EXITCODE"
+			do_touch
+			exit 1
+		fi
+	done
+	debug "Success from subcommands $@"
+}
