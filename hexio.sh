@@ -27,7 +27,7 @@ do_build () {
 	else
 		cd "$DIR_BUILD"
 		empty_dir
-		cmake "$DIR_GIT"
+		cmake -D CMAKE_INSTALL_PREFIX:PATH=/usr "$DIR_GIT"
 		make && \
 		empty_dir "$DIR_TREE" && \
 		make DESTDIR="$DIR_TREE" install

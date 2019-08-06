@@ -41,10 +41,10 @@ mkdir -p "${DIR_TREE}" "${DIR_BUILD}" "${DIR_SRC}" "${DIR_FETCH}"
 empty_dir () {
 	EMPTY_DIR=${1:-$PWD}
 	case "$EMPTY_DIR" in
-	"$DIR_TREE"|"$DIR_SRC"|"$DIR_BUILD"|"$DIR_TREE")
+	"$DIR_TREE"|"$DIR_SRC"|"$DIR_BUILD"|"$DIR_TREE"|"$DIR_FETCH")
 		rm -rf "$EMPTY_DIR/"*
 		;;
-	"$DIR_TREE"/*|"$DIR_SRC"/*|"$DIR_BUILD"/*|"$DIR_TREE"/*)
+	"$DIR_TREE"/*|"$DIR_SRC"/*|"$DIR_BUILD"/*|"$DIR_TREE"/*|"$DIR_FETCH"/*)
 		rm -rf "$EMPTY_DIR"
 		;;
 	*)

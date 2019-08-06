@@ -10,6 +10,7 @@ After this, we ran `apt-get update` and still had to post-add:
   - `cmake`
   - `wget`
   - `pkg-config`
+  - `autoconf` and `automake`
 
 In addition, it is optional but desirable to also add:
 

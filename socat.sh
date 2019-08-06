@@ -1,19 +1,21 @@
 #!/bin/bash
 #
-# mbusd build script
+# socat build script
 
 . $(dirname "$0")/lib/stdlib
 
-# STABLE=0.0.0
+STABLE=1.7.3.3
 
 do_update () {
+	cd "$DIR_FETCH"
+	wget http://www.dest-unreach.org/socat/download/socat-${STABLE}.tar.gz
 	cd "$DIR_SRC"
-	empty_dir
-	git clone https://github.com/3cky/mbusd mbusd.git
+	empty_dir "$DIR_SRC/socat-${STABLE}"
+	tar -xzvf "$DIR_FETCH/socat-${STABLE}.tar.gz"
 }
 
 do_touch () {
-	touch "$DIR_GIT"
+	touch "$DIR_SRC/socat-${STABLE}"
 }
 
 do_dependencies () {
@@ -21,13 +23,13 @@ do_dependencies () {
 }
 
 do_build () {
-	if [ "$DIR_BUILD" -nt "$DIR_GIT" ]
+	if [ "$DIR_BUILD" -nt "$DIR_SRC/socat-${STABLE}" ]
 	then
 		echo 'Reusing build, as it postdates the source'
 	else
 		cd "$DIR_BUILD"
 		empty_dir
-		cmake -D CMAKE_INSTALL_PREFIX:PATH=/usr "$DIR_GIT"
+		"$DIR_SRC/socat-${STABLE}/configure" --prefix="/usr" && \
 		make && \
 		empty_dir "$DIR_TREE" && \
 		make DESTDIR="$DIR_TREE" install

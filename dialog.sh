@@ -1,19 +1,22 @@
 #!/bin/bash
 #
-# mbusd build script
+# socat build script
 
 . $(dirname "$0")/lib/stdlib
 
-# STABLE=0.0.0
-
 do_update () {
+	cd "$DIR_FETCH"
+	# Note: unversioned download...
+	empty_dir
+	wget https://invisible-island.net/datafiles/release/dialog.tar.gz
 	cd "$DIR_SRC"
 	empty_dir
-	git clone https://github.com/3cky/mbusd mbusd.git
+	tar -xzvf "$DIR_FETCH/dialog.tar.gz"
+	mv dialog-* dialog
 }
 
 do_touch () {
-	touch "$DIR_GIT"
+	touch "$DIR_SRC/dialog"
 }
 
 do_dependencies () {
@@ -21,13 +24,13 @@ do_dependencies () {
 }
 
 do_build () {
-	if [ "$DIR_BUILD" -nt "$DIR_GIT" ]
+	if [ "$DIR_BUILD" -nt "$DIR_SRC/dialog" ]
 	then
 		echo 'Reusing build, as it postdates the source'
 	else
 		cd "$DIR_BUILD"
 		empty_dir
-		cmake -D CMAKE_INSTALL_PREFIX:PATH=/usr "$DIR_GIT"
+		"$DIR_SRC/dialog/configure" --prefix="/usr" && \
 		make && \
 		empty_dir "$DIR_TREE" && \
 		make DESTDIR="$DIR_TREE" install
