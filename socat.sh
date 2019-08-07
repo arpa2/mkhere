@@ -6,16 +6,17 @@
 
 STABLE=1.7.3.3
 
+do_touch () {
+	touch "$DIR_SRC/socat-${STABLE}"
+}
+
 do_update () {
 	cd "$DIR_FETCH"
 	wget http://www.dest-unreach.org/socat/download/socat-${STABLE}.tar.gz
 	cd "$DIR_SRC"
 	empty_dir "$DIR_SRC/socat-${STABLE}"
 	tar -xzvf "$DIR_FETCH/socat-${STABLE}.tar.gz"
-}
-
-do_touch () {
-	touch "$DIR_SRC/socat-${STABLE}"
+	do_touch
 }
 
 do_dependencies () {

@@ -6,16 +6,17 @@
 
 STABLE=2.8.3
 
+do_touch () {
+	touch "$DIR_SRC/knot-${STABLE}"
+}
+
 do_update () {
 	cd "$DIR_FETCH"
 	wget https://secure.nic.cz/files/knot-dns/knot-${STABLE}.tar.xz
 	cd "$DIR_SRC"
 	empty_dir "$DIR_SRC/knot-${STABLE}"
 	tar -xJvf "$DIR_FETCH/knot-${STABLE}.tar.xz"
-}
-
-do_touch () {
-	touch "$DIR_SRC/knot-${STABLE}"
+	do_touch
 }
 
 do_dependencies () {

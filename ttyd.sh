@@ -1,37 +1,36 @@
 #!/bin/bash
 #
-# socat build script
+# ttyd build script
 
 . $(dirname "$0")/lib/stdlib
 
-do_touch () {
-	touch "$DIR_SRC/dialog"
-}
+# STABLE=0.0.0
 
 do_update () {
-	cd "$DIR_FETCH"
-	# Note: unversioned download...
-	empty_dir
-	wget https://invisible-island.net/datafiles/release/dialog.tar.gz
 	cd "$DIR_SRC"
 	empty_dir
-	tar -xzvf "$DIR_FETCH/dialog.tar.gz"
-	mv dialog-* dialog
-	do_touch
+	git clone https://github.com/tsl0922/ttyd ttyd.git
+}
+
+do_touch () {
+	touch "$DIR_GIT"
 }
 
 do_dependencies () {
-	echo -n ''
+	echo 'vim-common'
+	echo 'libwebsockets-dev'
+	echo 'libjson-c-dev'
+	echo 'libssl-dev'
 }
 
 do_build () {
-	if [ "$DIR_BUILD" -nt "$DIR_SRC/dialog" ]
+	if [ "$DIR_BUILD" -nt "$DIR_GIT" ]
 	then
 		echo 'Reusing build, as it postdates the source'
 	else
 		cd "$DIR_BUILD"
 		empty_dir
-		"$DIR_SRC/dialog/configure" --prefix="/usr" && \
+		cmake -D CMAKE_INSTALL_PREFIX:PATH=/usr "$DIR_GIT"
 		make && \
 		empty_dir "$DIR_TREE" && \
 		make DESTDIR="$DIR_TREE" install

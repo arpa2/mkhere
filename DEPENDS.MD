@@ -10,7 +10,10 @@ After this, we ran `apt-get update` and still had to post-add:
   - `cmake`
   - `wget`
   - `pkg-config`
+  - `bison` and `flex`
   - `autoconf` and `automake`
+  - `libtool`
+  - `gdbserver` and `gdb`
 
 In addition, it is optional but desirable to also add:
 
