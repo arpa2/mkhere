@@ -29,10 +29,11 @@ setup script.
 Subcommands of the `/mkhere/xxx.sh` can be added on the commandline,
 either one or multiple:
 
-  * `update` to have the latest version of a package
+  * `update` to have a package's latest source code and build dependencies
   * `touch` to mark the source as newer than anything built
   * `dependencies` to list build dependencies (for now, Debian stable pkgs)
   * `depend` to install the packages listed by `dependencies`
+  * `have` to ensure having both source code and dependencies for a package
   * `build` to run configuration and building, as required
   * `list` to list packages, possibly specific to `FLAVOUR_xxx=fff`
     which makes a consistent selection from among the `VARIANT_xxx=vvv`
@@ -78,6 +79,13 @@ However, you will always want to build automatically, but only if needed, as par
 /path/to/mkhere/xxx.sh build
 ```
 
+Note that an automated build may alternatively take care of `update` and
+`depend` too, in case the operator did not do it:
+
+```
+/path/to/mkhere/xxx.sh have build
+```
+
 While working on the script containing this, if it fails, you can manually go back after downgrading the build, and possibly even build it on the spot,
 
 ```
@@ -103,3 +111,20 @@ It is intentional that most of the actions above constitute exactly one command.
 As for the `/path/to`, we are sure you have a taste about ways of setting
 this path.  Include it into your package's configuration and export as an
 environment variable, for instance.
+
+We have an extra command in preparation.  It is possible to retrieve
+OS libraries used from the installed dependencies for any given flavour,
+and it is likely that we will find a way to mix it into the flavours
+later on.  For now, two commands exists to retrieve the OS libraries.
+
+To find the names of OS libraries that are needed,
+
+```
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh oslibs
+```
+
+and to retrieve them in a tarball,
+
+```
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh oslibtar
+```

@@ -1,22 +1,22 @@
 #!/bin/bash
 #
-# dialog build script
+# rz/sz build script
 
 . $(dirname "$0")/lib/stdlib
 
+#Note: Debian has a 0.12.21 which is not released?!?
+STABLE=0.12.20
+
 do_touch () {
-	touch "$DIR_SRC/dialog"
+	touch "$DIR_SRC/lrzsz-${STABLE}"
 }
 
 do_update () {
 	cd "$DIR_FETCH"
-	# Note: unversioned download...
-	empty_dir
-	wget https://invisible-island.net/datafiles/release/dialog.tar.gz
+	wget https://ohse.de/uwe/releases/lrzsz-${STABLE}.tar.gz
 	cd "$DIR_SRC"
-	empty_dir
-	tar -xzvf "$DIR_FETCH/dialog.tar.gz"
-	mv dialog-* dialog
+	empty_dir "$DIR_SRC/lrzsz-${STABLE}"
+	tar -xzvf "$DIR_FETCH/lrzsz-${STABLE}.tar.gz"
 	do_touch
 }
 
@@ -25,13 +25,13 @@ do_dependencies () {
 }
 
 do_build () {
-	if [ "$DIR_BUILD" -nt "$DIR_SRC/dialog" ]
+	if [ "$DIR_BUILD" -nt "$DIR_SRC/lrzsz-${STABLE}" ]
 	then
 		echo 'Reusing build, as it postdates the source'
 	else
 		cd "$DIR_BUILD"
 		empty_dir
-		"$DIR_SRC/dialog/configure" --prefix="/usr" && \
+		"$DIR_SRC/lrzsz-${STABLE}/configure" --prefix="/usr" && \
 		make && \
 		empty_dir "$DIR_TREE" && \
 		make DESTDIR="$DIR_TREE" install

@@ -1,37 +1,42 @@
 #!/bin/bash
 #
-# dialog build script
+# mosh build script
 
 . $(dirname "$0")/lib/stdlib
 
+STABLE=1.3.2
+
 do_touch () {
-	touch "$DIR_SRC/dialog"
+	touch "$DIR_SRC/mosh-${STABLE}"
 }
 
 do_update () {
 	cd "$DIR_FETCH"
-	# Note: unversioned download...
-	empty_dir
-	wget https://invisible-island.net/datafiles/release/dialog.tar.gz
+	wget https://mosh.org/mosh-${STABLE}.tar.gz
 	cd "$DIR_SRC"
-	empty_dir
-	tar -xzvf "$DIR_FETCH/dialog.tar.gz"
-	mv dialog-* dialog
+	empty_dir "$DIR_SRC/mosh-${STABLE}"
+	tar -xzvf "$DIR_FETCH/mosh-${STABLE}.tar.gz"
 	do_touch
 }
 
 do_dependencies () {
-	echo -n ''
+	echo perl
+	echo protobuf-compiler
+	echo libprotobuf-dev
+	echo libncurses5-dev
+	echo zlib1g-dev
+	echo libutempter-dev
+	echo libssl-dev
 }
 
 do_build () {
-	if [ "$DIR_BUILD" -nt "$DIR_SRC/dialog" ]
+	if [ "$DIR_BUILD" -nt "$DIR_SRC/mosh-${STABLE}" ]
 	then
 		echo 'Reusing build, as it postdates the source'
 	else
 		cd "$DIR_BUILD"
 		empty_dir
-		"$DIR_SRC/dialog/configure" --prefix="/usr" && \
+		"$DIR_SRC/mosh-${STABLE}/configure" --prefix="/usr" && \
 		make && \
 		empty_dir "$DIR_TREE" && \
 		make DESTDIR="$DIR_TREE" install

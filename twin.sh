@@ -12,8 +12,10 @@ do_update () {
 	git clone https://github.com/cosmos72/twin twin.git
 	cd twin.git
 	git remote add vanrein https://github.com/vanrein/twin
-	git fetch vanrein pr-multiline-menu
-	git merge vanrein/pr-multiline-menu
+	# git fetch vanrein pr-multiline-menu
+	# git merge vanrein/pr-multiline-menu
+	git fetch vanrein rvrmods
+	git merge --no-edit vanrein/rvrmods
 }
 
 do_touch () {

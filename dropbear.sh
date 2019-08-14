@@ -1,22 +1,21 @@
 #!/bin/bash
 #
-# dialog build script
+# dropbear build script
 
 . $(dirname "$0")/lib/stdlib
 
+STABLE=2019.78
+
 do_touch () {
-	touch "$DIR_SRC/dialog"
+	touch "$DIR_SRC/dropbear-${STABLE}"
 }
 
 do_update () {
 	cd "$DIR_FETCH"
-	# Note: unversioned download...
-	empty_dir
-	wget https://invisible-island.net/datafiles/release/dialog.tar.gz
+	wget https://matt.ucc.asn.au/dropbear/releases/dropbear-${STABLE}.tar.bz2
 	cd "$DIR_SRC"
-	empty_dir
-	tar -xzvf "$DIR_FETCH/dialog.tar.gz"
-	mv dialog-* dialog
+	empty_dir "$DIR_SRC/dropbear-${STABLE}"
+	tar -xjvf "$DIR_FETCH/dropbear-${STABLE}.tar.bz2"
 	do_touch
 }
 
@@ -25,13 +24,13 @@ do_dependencies () {
 }
 
 do_build () {
-	if [ "$DIR_BUILD" -nt "$DIR_SRC/dialog" ]
+	if [ "$DIR_BUILD" -nt "$DIR_SRC/dropbear-${STABLE}" ]
 	then
 		echo 'Reusing build, as it postdates the source'
 	else
 		cd "$DIR_BUILD"
 		empty_dir
-		"$DIR_SRC/dialog/configure" --prefix="/usr" && \
+		"$DIR_SRC/dropbear-${STABLE}/configure" --prefix="/usr" && \
 		make && \
 		empty_dir "$DIR_TREE" && \
 		make DESTDIR="$DIR_TREE" install

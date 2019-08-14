@@ -16,6 +16,8 @@ do_touch () {
 	touch "$DIR_GIT"
 }
 
+# Note: lrzsz is very useful, but a *rntime* dependency
+# Just try sz and rz on an embedded commandline for download and upload
 do_dependencies () {
 	echo 'vim-common'
 	echo 'libwebsockets-dev'

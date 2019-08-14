@@ -1,22 +1,22 @@
 #!/bin/bash
 #
-# dialog build script
+# mbedTLS build script
 
 . $(dirname "$0")/lib/stdlib
 
+STABLE=2.16.2
+
 do_touch () {
-	touch "$DIR_SRC/dialog"
+	touch "$DIR_SRC/mbedtls-${STABLE}"
 }
 
 do_update () {
 	cd "$DIR_FETCH"
-	# Note: unversioned download...
 	empty_dir
-	wget https://invisible-island.net/datafiles/release/dialog.tar.gz
+	wget https://tls.mbed.org/download/mbedtls-${STABLE}-apache.tgz
 	cd "$DIR_SRC"
 	empty_dir
-	tar -xzvf "$DIR_FETCH/dialog.tar.gz"
-	mv dialog-* dialog
+	tar -xzvf "$DIR_FETCH/mbedtls-${STABLE}-apache.tgz"
 	do_touch
 }
 
@@ -25,13 +25,13 @@ do_dependencies () {
 }
 
 do_build () {
-	if [ "$DIR_BUILD" -nt "$DIR_SRC/dialog" ]
+	if [ "$DIR_BUILD" -nt "$DIR_SRC/mbedtls-${STABLE}" ]
 	then
 		echo 'Reusing build, as it postdates the source'
 	else
 		cd "$DIR_BUILD"
 		empty_dir
-		"$DIR_SRC/dialog/configure" --prefix="/usr" && \
+		cmake -D CMAKE_INSTALL_PREFIX:PATH=/usr "$DIR_SRC/mbedtls-${STABLE}"
 		make && \
 		empty_dir "$DIR_TREE" && \
 		make DESTDIR="$DIR_TREE" install

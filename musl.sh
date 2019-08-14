@@ -1,22 +1,21 @@
 #!/bin/bash
 #
-# dialog build script
+# musl build script
 
 . $(dirname "$0")/lib/stdlib
 
+STABLE=1.1.23
+
 do_touch () {
-	touch "$DIR_SRC/dialog"
+	touch "$DIR_SRC/musl-${STABLE}"
 }
 
 do_update () {
 	cd "$DIR_FETCH"
-	# Note: unversioned download...
-	empty_dir
-	wget https://invisible-island.net/datafiles/release/dialog.tar.gz
+	wget https://www.musl-libc.org/releases/musl-${STABLE}.tar.gz
 	cd "$DIR_SRC"
-	empty_dir
-	tar -xzvf "$DIR_FETCH/dialog.tar.gz"
-	mv dialog-* dialog
+	empty_dir "$DIR_SRC/musl-${STABLE}"
+	tar -xzvf "$DIR_FETCH/musl-${STABLE}.tar.gz"
 	do_touch
 }
 
@@ -25,13 +24,13 @@ do_dependencies () {
 }
 
 do_build () {
-	if [ "$DIR_BUILD" -nt "$DIR_SRC/dialog" ]
+	if [ "$DIR_BUILD" -nt "$DIR_SRC/musl-${STABLE}" ]
 	then
 		echo 'Reusing build, as it postdates the source'
 	else
 		cd "$DIR_BUILD"
 		empty_dir
-		"$DIR_SRC/dialog/configure" --prefix="/usr" && \
+		"$DIR_SRC/musl-${STABLE}/configure" --prefix="/usr" && \
 		make && \
 		empty_dir "$DIR_TREE" && \
 		make DESTDIR="$DIR_TREE" install
