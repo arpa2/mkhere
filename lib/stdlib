@@ -17,16 +17,21 @@ fi
 # Derive $TARGET and ensure its rootfs
 TARGET=$(basename "$0")
 TARGET=${TARGET%.sh}
+VARIANT_TARGET="VARIANT_${TARGET}"
+FLAVOUR_TARGET="FLAVOUR_${TARGET}"
 if [ "$0" != "/mkhere/$TARGET.sh" ]
 then
 	NEWROOT=$(dirname "$0")/..
 	debug Changing to build rootfs $NEWROOT
+	# Following are useless, without export they don't seem to get here
+	export $VARIANT_TARGET
+	export $FLAVOUR_TARGET
 	exec chroot "$NEWROOT" /mkhere/$TARGET.sh "$@"
 fi
 
 # Derive variables $VARIANT and $FLAVOUR
-VARIANT=${VARIANT_${TARGET}}  #TODO#
-FLAVOUR=${FLAVOUR_${TARGET}}  #TODO#
+VARIANT=${!VARIANT_TARGET}
+FLAVOUR=${!FLAVOUR_TARGET}
 debug Script target is $TARGET, variant is $VARIANT, flavour is $FLAVOUR
 
 # Derive DIR_SRC, DIR_GIT, DIR_BUILD, DIR_TREE and have them
@@ -78,6 +83,129 @@ do_cpio () {
 do_cpiogz () {
 	do_cpio | gzip --best
 }
+
+# If not yet downloaded, fetch a first source code update
+do_have () {
+	if [ $(ls -1 "$DIR_SRC" | wc -l) -eq 0 ]
+	then
+		do_update
+		do_depend
+	fi
+}
+
+# Helper: Turn a list into a set by removing repeated entries (leave the first)
+_mkset () {
+	RETVAL=()
+	for ELEM in "$@"
+	do
+		NEW=1
+		for KNOWN in ${RETVAL[@]}
+		do
+			if [ "$ELEM" == "$KNOWN" ]
+			then
+				NEW=0
+			fi
+		done
+		if [ $NEW -eq 1 ]
+		then
+			RETVAL+=( $ELEM )
+		fi
+	done
+	echo ${RETVAL[@]}
+}
+
+# OS libraries from the build system that are needed for a package
+do_oslibs () {
+	LIBDIRS=$(
+		cat /etc/ld.so.conf /etc/ld.so.conf.d/* | \
+		sed -e 's/#.*$//' -e '/^[ \t]*$/d' -e '/^include[ \t].*/d'
+	)
+	# First, list all software (of the requested flavour)
+	SWARE=( $( do_list ) )
+	# Second, find linked libraries (dropping system-specific ones)
+	REFLIBS=( $( _mkset $(
+		for FILE in ${SWARE[@]}
+		do
+			if [ -x "$DIR_TREE/$FILE" ]
+			then
+				ldd "$DIR_TREE/$FILE" | \
+					sed \
+						-e 's/^[ \t]*//' \
+						-e 's/ .*//' \
+						-e '/^linux-vdso\.so.*/d' \
+						-e '/^[/]lib[/]ld-linux\.so.*/d' | \
+					sort | uniq
+			fi
+		done
+	) ) )
+	# Third, mention external, and recurse on internal + external
+	EXTREFS=()
+	NEWREFS=()
+	ADDREFS=( ${REFLIBS[@]} )
+	REFLIBS=()
+	while [ ${#ADDREFS[@]} -ne 0 ]
+	do
+		REFLIBS=( ${NEWREFS[@]} )
+		NEWREFS=()
+		for LIBNAME in ${ADDREFS[@]}
+		do
+			#TODO# Consider searching /tree for dependent pkgs too?
+			for LIBFILE in $( find 2>/dev/null "$DIR_TREE" $LIBDIRS -follow -type f -name "$LIBNAME" )
+			do
+				#DEBUG# echo "Looking into $LIBNAME => $LIBFILE"
+				case "$LIBFILE" in
+				# References to our own package are installed,
+				# but they may lead to further references in
+				# the base system.  For this reason, do not
+				# mention but traverse them recursively.
+				$DIR_TREE/*)
+					# echo >&2 DEBUG: Internal $LIBFILE
+					NEWREFS+=( "$LIBNAME" )
+					;;
+				# References to other packages may be dropped.
+				# It is understood that dependent libraries
+				# will be installed by the caller anyway.
+				# This is hoping that flavours will be okay.
+				/tree/*)
+					# echo >&2 DEBUG: Peer $LIBFILE
+					;;
+				# References to the base system are mentioned.
+				# In addition, they may hold references to
+				# other libraries in the base system.  For this
+				# reason, traverse them recursively.
+				*)
+					# echo >&2 DEBUG: External $LIBFILE
+					EXTREFS+=( "$LIBFILE" )
+					NEWREFS+=( "$LIBNAME" )
+					;;
+				esac
+			done
+		done
+		NEWREFS=( $( _mkset ${REFLIBS[@]} ${NEWREFS[@]} ) )
+		ADDREFS=( ${NEWREFS[@]:${#REFLIBS[@]}} )
+	done
+	EXTREFS=( $( _mkset ${EXTREFS[@]} ) )
+	# Fourth, resolve symbolic links by adding the referenced files
+	ALLFILES=()
+	for FILE in ${EXTREFS[@]}
+	do
+		echo "$FILE"
+		# ls -l "$FILE"
+		while [ -L "$FILE" ]
+		do
+			FILE=$(readlink -f "$FILE")
+			echo "$FILE"
+			# ls -l "$FILE"
+		done
+	done
+}
+
+# Construct a tar ball with os libs
+#TODO# Maybe use this in a flavour, later on
+do_oslibtar () {
+	( cd / ; tar -cf - $(do_oslibs) )
+}
+
 
 # Main programming, running the commands in argv[]
 main_do_commands () {
