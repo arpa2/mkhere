@@ -48,6 +48,12 @@ either one or multiple:
   * `cpioprefix` or `oslibcpioprefix` produce a CPIO archive without
     the trailer.  This can be used when further commands concatenate
     files in CPIO format; only the last should not have this.
+  * There even are variants `cpiogzprefix` and `oslibcpiogzprefix`
+    that zip the CPIO archives without the trailer.  Since you can
+    concatenate GZIP files as well as using prefix CPIO archives
+    before a plain CPIO, you can concatenate gzipped archives.  You
+    cannot mix gzipped and non-gzipped content, though, as you still
+    need to pass the concatenated result through a gunzipper.
   * `install` can only be the last command.  It will be removed in
     the `chroot` environment, and pass the output into an installer
     for the CPIO archive, which runs in the calling directory.

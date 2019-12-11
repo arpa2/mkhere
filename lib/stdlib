@@ -110,6 +110,11 @@ do_cpiogz () {
 	do_cpio | gzip --best
 }
 
+# Generic do_cpiogz, but without the TRAILER in the last line
+do_cpiogzprefix () {
+	do_cpioprefix | gzip --best
+}
+
 # If not yet downloaded, fetch a first source code update
 do_have () {
 	if [ $(ls -1 "$DIR_SRC" | wc -l) -eq 0 ]
@@ -237,9 +242,19 @@ do_oslibcpio () {
 	( cd / ; do_oslibs | cpio -o -H newc --quiet )
 }
 
+# Construct a gzipped cpio archive with os libs (perhaps after cpioprefix)
+do_oslibcpiogz () {
+	do_oslibcpio | gzip --best
+}
+
 # Construct a cpio archive with os libs without TRAILER last line
 do_oslibcpioprefix () {
 	do_oslibcpio | strip_cpio_trailer
+}
+
+# Construct a gzipped cpio archive with os libs without TRAILER last line
+do_oslibcpiogzprefix () {
+	do_oslibcpioprefix | gzip --best
 }
 
 # Refuse to install with an intermediate command
