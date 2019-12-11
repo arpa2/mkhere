@@ -118,7 +118,10 @@ As for the `/path/to`, we are sure you have a taste about ways of setting
 this path.  Include it into your package's configuration and export as an
 environment variable, for instance.
 
-We have an extra command in preparation.  It is possible to retrieve
+
+## Operating System Libraries
+
+It is possible to retrieve
 OS libraries used from the installed dependencies for any given flavour,
 and it is likely that we will find a way to mix it into the flavours
 later on.  For now, two commands exists to retrieve the OS libraries.
@@ -160,3 +163,28 @@ FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpioprefix oslibcpio install
 where the separation of the commands is useful because the first
 produces user output and the second merely installs packages in the
 current directory.
+
+
+## Operating System Packages
+
+It is possible to extract packages from the underlying operating
+system, of course along with library requirements.  This implements
+the customary targets for listing and archiving and even installation,
+as part of a special target `/path/to/mkhere/ospackages.sh` which is
+sensitive to a space-separated list of packages in `FLAVOUR_ospackages`.
+
+So, to retrieve the OS package plus dependent libraries instead of
+building something from source, the formulation is only changed lightly,
+passing the packages through the flavour mechanism to a standard target,
+
+```
+FLAVOUR_ospackages='bash gcc' /path/to/mkhere/ospackages.sh depend have build
+FLAVOUR_ospackages='bash gcc' /path/to/mkhere/ospackages.sh cpioprefix oslibcpio install
+```
+
+Here, `depend` installs the packages listed in the flavour variable;
+`have` installs nothing; `build` sets up links to the installation
+root, which is necessary for listing the files in preparation of packaging.
+
+You can invoke this more than once, using different flavours, if you like.
+
