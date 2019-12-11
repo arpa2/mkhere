@@ -1,0 +1,76 @@
+# Package Handler library
+#
+# Include this file before you invoke pkg_xxx functions.
+#
+# These are the routines that implement local package handling.
+# Specifically, there is support for installing them.
+#
+# These routines detect the current operation system and/or
+# packaging discipline, with a fallback on apt under Debian.
+#
+# All packages are named as on Debian Linux, at least for now,
+# so translation may be necessary.
+#
+# From: Rick van Rein <rick@openfortress.nl>
+
+
+
+# Only run through this file once
+#
+[ -z $PKGLIB_TYPE ] || exit 0
+
+
+# Use "uname" output to determine the packaging system,
+# possibly drilling down more if needed.
+#
+case $(uname) in
+
+MSYS_NT-10.0|MSYS_NT-*)
+	PKGLIB_TYPE=msys
+	exit 1
+	;;
+
+*)
+	PKGLIB_TYPE=debian
+	;;
+
+esac
+
+
+#
+# Obliged functions to implement:
+#
+# pkg_install x y z --> install packages named x, y and z.
+# pkg_listfiles x --> list files in package named x.
+#
+
+
+
+#
+# Debian packages, using apt/dpkg
+#
+
+if [ $PKGLIB_TYPE = debian ]
+then
+
+	pkg_install() {
+		apt -y install "$@"
+	}
+
+	pkg_listfiles() {
+		dpkg -L "$1"
+	}
+
+fi
+
+
+#
+# MSYS packages
+#
+
+if [ $PKGLIB_TYPE == msys ]
+then
+	echo No support functions for MSYS yet
+	exit 1
+fi
+

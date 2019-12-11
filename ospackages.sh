@@ -37,10 +37,10 @@ do_build () {
 }
 
 do_list () {
-	# Specific for Debian packages -- may need a utility library
+	. $(dirname "$0")/lib/pkglib
 	for PKG in $FLAVOUR_ospackages
 	do
-		dpkg -L $PKG | sed 's+^/++' | \
+		pkg_listfiles $PKG | sed 's+^/++' | \
 			while read FILE
 			do
 				if [ ! -d "/$FILE" ]

@@ -81,8 +81,8 @@ empty_dir () {
 
 # Generic subcommand for installing dependencies
 do_depend () {
-	# Specific for Debian packages -- may need a utility library
-	apt -y install $(do_dependencies)
+	. $(dirname "$0")/lib/pkglib
+	pkg_install $(do_dependencies)
 }
 
 # Generic do_tar, based on do_list
