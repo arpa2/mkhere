@@ -45,6 +45,12 @@ either one or multiple:
     streams can be concatenated to form larger wholes, and so can
     Linux' initial rootfs's.  As with `list`, the `FLAVOUR_xxx=fff`
     settings will work.
+  * `cpioprefix` or `oslibcpioprefix` produce a CPIO archive without
+    the trailer.  This can be used when further commands concatenate
+    files in CPIO format; only the last should not have this.
+  * `install` can only be the last command.  It will be removed in
+    the `chroot` environment, and pass the output into an installer
+    for the CPIO archive, which runs in the calling directory.
 
 Any build dependencies will be installed before building commences.
 This may be somewhat platform-specific.  We start off with Debian.
@@ -106,7 +112,7 @@ You can line this up as your `initrd=` image for a kernel, or you could ask for 
 FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh tar | tar -xvf -
 ```
 
-It is intentional that most of the actions above constitute exactly one command.
+It is intentional that most of the actions above constitute exactly one shell command.
 
 As for the `/path/to`, we are sure you have a taste about ways of setting
 this path.  Include it into your package's configuration and export as an
@@ -128,3 +134,29 @@ and to retrieve them in a tarball,
 ```
 FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh oslibtar
 ```
+
+To collect a package together with OS libraries, you can produce a CPIO
+archive for the package by dropping the trailer from the first archive,
+
+```
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpioprefix oslibcpio
+```
+
+and you could additionally install the produced archive in the calling
+directory, which is usually outside the build root, with
+
+```
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpioprefix oslibcpio install
+```
+
+The complete call to build and install a package with all that it
+takes might be as simple as
+
+```
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh depend have build
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpioprefix oslibcpio install
+```
+
+where the separation of the commands is useful because the first
+produces user output and the second merely installs packages in the
+current directory.
