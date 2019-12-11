@@ -237,6 +237,11 @@ do_oslibtar () {
 	( cd / ; tar -cf - $(do_oslibs) )
 }
 
+# Construct a gzipped tar ball with os libs
+do_oslibtgz () {
+	do_oslibtar | gzip --best
+}
+
 # Construct a cpio archive with os libs (perhaps after cpioprefix)
 do_oslibcpio () {
 	( cd / ; do_oslibs | cpio -o -H newc --quiet )

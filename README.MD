@@ -9,7 +9,7 @@ where all the build tools are native:
     variants is done in-situ, and clashes resolved in the Git repository
     of these build scripts.  The scripts will `chroot` to their local
     system, so that their path is shortened to `/mkhere/xxx.sh` when called
-    as `/path/to/mkhere/xxx`.  Subcommands exist.
+    as `/path/to/mkhere/xxx.sh`.  Subcommands exist.
   * `/src/xxx` is the Git repository for `xxx`, and will not be updated
     unless by the user.  Nothing is written here by the build system, so
     it is possible to share this among build platforms.
@@ -35,16 +35,20 @@ either one or multiple:
   * `depend` to install the packages listed by `dependencies`
   * `have` to ensure having both source code and dependencies for a package
   * `build` to run configuration and building, as required
+  * `variants` and `flavours` list the respective room for choice.
   * `list` to list packages, possibly specific to `FLAVOUR_xxx=fff`
     which makes a consistent selection from among the `VARIANT_xxx=vvv`
     compiled variant.  The flavour string `fff` can take any form.
-  * `variants` and `flavours` list the respective room for choice.
+  * `oslib` to list libraries from the underlying operating system
+    on which the package binaries depend.
   * `tar`, `tgz`, `cpio`, `cpiogz` export the `list` contents in a
     requested format.  Note that the `cpio` and `cpiogz` flavours
     are geared towards initial ram disk use; both CPIO and GZIP
     streams can be concatenated to form larger wholes, and so can
     Linux' initial rootfs's.  As with `list`, the `FLAVOUR_xxx=fff`
     settings will work.
+  * `oslibtar`, `oslibtgz`, `oslibcpio`, `oslibcpiogz` export the
+    `oslib` list of libraries from the underlying operating system.
   * `cpioprefix` or `oslibcpioprefix` produce a CPIO archive without
     the trailer.  This can be used when further commands concatenate
     files in CPIO format; only the last should not have this.
