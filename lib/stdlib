@@ -36,7 +36,7 @@ then
 				--no-absolute-filenames \
 				--make-directories \
 				--unconditional \
-				--quiet --list
+				--quiet --verbose
 		exit $?
 	else
 		# No install -- just run the command
