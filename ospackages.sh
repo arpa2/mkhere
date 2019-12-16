@@ -40,15 +40,30 @@ do_list () {
 	. $(dirname "$0")/lib/pkglib
 	for PKG in $FLAVOUR_ospackages
 	do
-		pkg_listfiles $PKG | sed 's+^/++' | \
+		pkg_listfiles $PKG | \
 			while read FILE
 			do
+				# List all but directories
+				FILE=${FILE#/}
 				if [ ! -d "/$FILE" ]
 				then
 					echo "$FILE"
 				fi
+				# Additionally print link targets
+				while [ -L "/$FILE" ]
+				do
+					FILE=$(readlink -f "/$FILE")
+					FILE=${FILE#/}
+					if [ -d "/$FILE" ]
+					then
+						break
+					fi
+					echo "$FILE"
+				done
 			done
-	done
+	done | \
+	# Remove duplicates caused by link traversal
+	sort | uniq
 }
 
 do_variants () {
