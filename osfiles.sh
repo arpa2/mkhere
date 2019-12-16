@@ -7,6 +7,12 @@
 # The customary listings, packages and even oslib packages can be made
 # to retrieve the contents and possibly install them.
 #
+# Not all systems can produce newlines in literal input, and CMake may
+# be one of them.  To accommodate those, any sequence of two slashes
+# is translated to a newline before processing.  Note that this means
+# that two subsequence slashes in the file name are not forgiven.  No
+# canonical form of a file name has that sequence, of course.
+#
 # From: Rick van Rein <rick@openfortress.nl>
 
 
@@ -33,9 +39,10 @@ do_build () {
 }
 
 do_list () {
-	echo -n "$FLAVOUR_osfiles" | while read FILEPATN
+	echo -n "$FLAVOUR_osfiles" | sed "s+//+\n+g" | \
+	while read FILEPATN
 	do
-		ls -1 "$FILEPATN"
+		ls -1 $FILEPATN
 	done
 }
 
