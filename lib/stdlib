@@ -163,8 +163,7 @@ do_oslibs () {
 					sed \
 						-e 's/^[ \t]*//' \
 						-e 's/ .*//' \
-						-e '/^linux-vdso\.so.*/d' \
-						-e '/^[/]lib[/]ld-linux\.so.*/d' | \
+						-e '/^linux-vdso\.so.*/d' | \
 					sort | uniq
 			fi
 		done
@@ -180,6 +179,14 @@ do_oslibs () {
 		NEWREFS=()
 		for LIBNAME in ${ADDREFS[@]}
 		do
+			# If $LIBNAME is an existing full path, use it
+			# This is used for /lib/ld-linux.so.2 and similar
+			if [ -r "$LIBNAME" ]
+			then
+				EXTREFS+=( "$LIBNAME" )
+				NEWREFS+=( $(basename "$LIBNAME") )
+				continue
+			fi
 			#TODO# Consider searching /tree for dependent pkgs too?
 			for LIBFILE in $( find 2>/dev/null "$DIR_TREE" $LIBDIRS -follow -type f -name "$LIBNAME" )
 			do
