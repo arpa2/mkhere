@@ -175,7 +175,7 @@ produces user output and the second merely installs packages in the
 current directory.
 
 
-## Operating System Packages
+## Operating System Packages and Files
 
 It is possible to extract packages from the underlying operating
 system, of course along with library requirements.  This implements
@@ -198,3 +198,18 @@ root, which is necessary for listing the files in preparation of packaging.
 
 You can invoke this more than once, using different flavours, if you like.
 
+Similarly, you can export individual files.  For this, set `FLAVOUR_osfiles`
+to a file name (with glob support) per line.  Note that the last line must
+be terminated with a newline too!
+
+```
+FLAVOUR_osfiles='/bin/bash^J/usr/bin/gcc^J' /path/to/mkhere/osfiles.sh depend have build
+FLAVOUR_osfiles='/bin/bash^J/usr/bin/gcc^J' /path/to/mkhere/osfiles.sh cpioprefix oslibcpio install
+```
+
+Again, multiple invocations are possible.  A likely form of using this is to
+start general, by exporting whole packages, and to later minimise the size of
+the formed root file system by only choosing those files that are needed.
+
+This form is also useful for base files like `/etc/ld.so.conf` and
+core libraries, and even kernel modules.
