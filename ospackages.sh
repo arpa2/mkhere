@@ -44,7 +44,7 @@ do_list () {
 			while read FILE
 			do
 				# List all but directories
-				FILE=${FILE#/}
+				#TODO# FILE=${FILE#/}
 				if [ ! -d "/$FILE" ]
 				then
 					echo "$FILE"
@@ -53,7 +53,7 @@ do_list () {
 				while [ -L "/$FILE" ]
 				do
 					FILE=$(readlink -f "/$FILE")
-					FILE=${FILE#/}
+					#TODO# FILE=${FILE#/}
 					if [ -d "/$FILE" ]
 					then
 						break
