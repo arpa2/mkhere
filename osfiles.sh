@@ -38,7 +38,10 @@ do_build () {
 	find /* -maxdepth 0 | \
 		while read ROOTNAME
 		do
-			ln -s "$ROOTNAME" "$DIR_TREE$ROOTNAME"
+			if [ ! -h "$DIR_TREE$ROOTNAME" ]
+			then
+				ln -s "$ROOTNAME" "$DIR_TREE$ROOTNAME"
+			fi
 		done
 }
 
