@@ -8,6 +8,11 @@
 # packages and oslib packages can be made to retrieve the contents
 # and possibly install them.
 #
+# This mkhere script has an extra subcommand: "osupdate".  This
+# retrieves recent package listings online and installs updates
+# for all currently available packages.  Further details depend
+# on the underlying package manager setup.
+#
 # From: Rick van Rein <rick@openfortress.nl>
 
 
@@ -77,6 +82,12 @@ do_variants () {
 do_flavours () {
 	# Not helpful to list all combinations of all packages
 	echo -n ''
+}
+
+# The extra command for ospackages.sh
+do_osupdate () {
+	. $(dirname "$0")/lib/pkglib
+	pkg_update
 }
 
 main_do_commands "$@"
