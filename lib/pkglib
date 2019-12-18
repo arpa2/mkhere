@@ -27,7 +27,10 @@ case $(uname) in
 
 MSYS_NT-10.0|MSYS_NT-*)
 	PKGLIB_TYPE=msys
-	exit 1
+	;;
+
+OpenBSD)
+	PKGLIB_TYPE=openbsd
 	;;
 
 *)
@@ -70,7 +73,34 @@ fi
 
 if [ $PKGLIB_TYPE == msys ]
 then
-	echo No support functions for MSYS yet
-	exit 1
+
+	pkg_install() {
+		pacman --config /etc/pacman-msys.conf -U "$@"
+	}
+
+	pkg_listfiles() {
+		# pacman can list multiple packages, we only use one
+		pacman --config /etc/pacman-msys.conf -Q -l "$@"
+	}
+
 fi
+
+
+#
+# OpenBSD packages
+#
+
+if [ $PKGLIB_TYPE == openbsd ]
+then
+
+	pkg_install() {
+		pkg_add "$@"
+	}
+
+	pkg_listfiles() {
+		pkg_info -L "$1" | sed '1,/^Files:$/d'
+	}
+
+fi
+
 
