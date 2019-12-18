@@ -20,6 +20,10 @@ do_update () {
 }
 
 do_dependencies () {
+	echo -n ''
+}
+
+do_osdependencies () {
 	echo libsdl-dev
 	echo libncurses-dev
 }

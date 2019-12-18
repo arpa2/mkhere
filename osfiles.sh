@@ -30,6 +30,10 @@ do_dependencies () {
 	echo -n ''
 }
 
+do_osdependencies () {
+	echo -n ''
+}
+
 do_build () {
 	find /* -maxdepth 0 | \
 		while read ROOTNAME

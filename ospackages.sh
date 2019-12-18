@@ -22,6 +22,10 @@ do_update () {
 }
 
 do_dependencies () {
+	echo -n ''
+}
+
+do_osdependencies () {
 	for PKG in $FLAVOUR_ospackages
 	do
 		echo $PKG

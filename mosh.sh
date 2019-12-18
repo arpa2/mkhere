@@ -20,6 +20,10 @@ do_update () {
 }
 
 do_dependencies () {
+	echo -n ''
+}
+
+do_osdependencies () {
 	echo perl
 	echo protobuf-compiler
 	echo libprotobuf-dev

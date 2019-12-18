@@ -16,9 +16,13 @@ do_touch () {
 	touch "$DIR_GIT"
 }
 
+do_dependencies () {
+	echo -n ''
+}
+
 # Note: lrzsz is very useful, but a *rntime* dependency
 # Just try sz and rz on an embedded commandline for download and upload
-do_dependencies () {
+do_osdependencies () {
 	echo 'vim-common'
 	echo 'libwebsockets-dev'
 	echo 'libjson-c-dev'

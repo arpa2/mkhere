@@ -33,4 +33,4 @@ You may find it pleasant to also have things like
   - `ccmake-ncurses-gui`
 
 This does not include package dependencies, which are installed
-with `/mkhere/xxx.sh depend` of course.
+with `/mkhere/xxx.sh osdepend` of course.

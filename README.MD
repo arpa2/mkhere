@@ -29,11 +29,11 @@ setup script.
 Subcommands of the `/mkhere/xxx.sh` can be added on the commandline,
 either one or multiple:
 
-  * `update` to have a package's latest source code and build dependencies
+  * `update` to have a package's latest source code
   * `touch` to mark the source as newer than anything built
-  * `dependencies` to list build dependencies (for now, Debian stable pkgs)
-  * `depend` to install the packages listed by `dependencies`
-  * `have` to ensure having both source code and dependencies for a package
+  * `dependencies` and `osdependencies` to list build dependencies from source and from the underlying operating system (the latter: named like Debian stable pkgs)
+  * `osdepend` to install the packages listed by `osdependencies`
+  * `have` to ensure having the source code for a package
   * `build` to run configuration and building, as required
   * `variants` and `flavours` list the respective room for choice.
   * `list` to list packages, possibly specific to `FLAVOUR_xxx=fff`
@@ -62,7 +62,7 @@ either one or multiple:
     the `chroot` environment, and pass the output into an installer
     for the CPIO archive, which runs in the calling directory.
 
-Any build dependencies will be installed before building commences.
+Any build OS dependencies will be installed before building commences.
 This may be somewhat platform-specific.  We start off with Debian.
 There can be a `lib/yyy` structure that uses no `.sh` endings anywhere,
 so as to avoid clashes with the actual scripts.  This can be home to
@@ -80,13 +80,13 @@ Normally, you will want to update software manually,
 /path/to/mkhere/xxx.sh update
 ```
 
-Similarly, you would want to install build dependencies manually onto
+Similarly, you would want to install build OS dependencies manually onto
 the build system,
 
 ```
-/path/to/mkhere/xxx.sh dependencies | less
+/path/to/mkhere/xxx.sh osdependencies | less
 #then#
-/path/to/mkhere/xxx.sh depend
+/path/to/mkhere/xxx.sh osdepend
 ```
 
 However, you will always want to build automatically, but only if needed, as part of a script,
@@ -96,7 +96,7 @@ However, you will always want to build automatically, but only if needed, as par
 ```
 
 Note that an automated build may alternatively take care of `update` and
-`depend` too, in case the operator did not do it:
+`osdepend` too, in case the operator did not do it:
 
 ```
 /path/to/mkhere/xxx.sh have build
@@ -132,7 +132,7 @@ environment variable, for instance.
 ## Operating System Libraries
 
 It is possible to retrieve
-OS libraries used from the installed dependencies for any given flavour,
+OS libraries used from the installed OS dependencies for any given flavour,
 and it is likely that we will find a way to mix it into the flavours
 later on.  For now, two commands exists to retrieve the OS libraries.
 
@@ -166,7 +166,7 @@ The complete call to build and install a package with all that it
 takes might be as simple as
 
 ```
-FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh depend have build
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh osdepend have build
 FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpioprefix oslibcpio install
 ```
 
@@ -188,11 +188,11 @@ building something from source, the formulation is only changed lightly,
 passing the packages through the flavour mechanism to a standard target,
 
 ```
-FLAVOUR_ospackages='bash gcc' /path/to/mkhere/ospackages.sh depend have build
+FLAVOUR_ospackages='bash gcc' /path/to/mkhere/ospackages.sh osdepend have build
 FLAVOUR_ospackages='bash gcc' /path/to/mkhere/ospackages.sh cpioprefix oslibcpio install
 ```
 
-Here, `depend` installs the packages listed in the flavour variable;
+Here, `osdepend` installs the packages listed in the flavour variable;
 `have` installs nothing; `build` sets up links to the installation
 root, which is necessary for listing the files in preparation of packaging.
 
@@ -203,7 +203,7 @@ to a file name (with glob support) per line.  Note that the last line must
 be terminated with a newline too!
 
 ```
-FLAVOUR_osfiles='/bin/bash^J/usr/bin/gcc^J' /path/to/mkhere/osfiles.sh depend have build
+FLAVOUR_osfiles='/bin/bash^J/usr/bin/gcc^J' /path/to/mkhere/osfiles.sh osdepend have build
 FLAVOUR_osfiles='/bin/bash^J/usr/bin/gcc^J' /path/to/mkhere/osfiles.sh cpioprefix oslibcpio install
 ```
 

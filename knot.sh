@@ -20,6 +20,10 @@ do_update () {
 }
 
 do_dependencies () {
+	echo -n ''
+}
+
+do_osdependencies () {
 	echo gnutls-dev
 	echo liburcu-dev
 	echo libedit-dev

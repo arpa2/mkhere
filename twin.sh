@@ -23,6 +23,10 @@ do_touch () {
 }
 
 do_dependencies () {
+	echo -n ''
+}
+
+do_osdependencies () {
 	echo 'libgpm-dev'
 	echo 'libgpm2'
 }

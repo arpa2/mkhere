@@ -24,6 +24,10 @@ do_dependencies () {
 	echo -n ''
 }
 
+do_osdependencies () {
+	echo -n ''
+}
+
 do_build () {
 	if [ "$DIR_BUILD" -nt "$DIR_SRC/mbedtls-${STABLE}" ]
 	then
