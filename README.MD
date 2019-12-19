@@ -33,7 +33,10 @@ either one or multiple:
   * `touch` to mark the source as newer than anything built
   * `dependencies` and `osdependencies` to list build dependencies from source and from the underlying operating system (the latter: named like Debian stable pkgs)
   * `osdepend` to install the packages listed by `osdependencies`
-  * `have` to ensure having the source code for a package
+  * `have` to ensure having the source code for a package and its dependency's
+    source code as well
+  * `check` to check that the source code has been built
+  * `depend` to check that source code dependencies have been built
   * `build` to run configuration and building, as required
   * `variants` and `flavours` list the respective room for choice.
   * `list` to list packages, possibly specific to `FLAVOUR_xxx=fff`
@@ -87,6 +90,14 @@ the build system,
 /path/to/mkhere/xxx.sh osdependencies | less
 #then#
 /path/to/mkhere/xxx.sh osdepend
+```
+
+And you might take the same approach to source code dependencies,
+
+```
+/path/to/mkhere/xxx.sh dependencies | less
+#then#
+/path/to/mkhere/xxx.sh depend
 ```
 
 However, you will always want to build automatically, but only if needed, as part of a script,
@@ -166,7 +177,7 @@ The complete call to build and install a package with all that it
 takes might be as simple as
 
 ```
-FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh osdepend have build
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh osdepend depend have build
 FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpioprefix oslibcpio install
 ```
 
@@ -188,11 +199,12 @@ building something from source, the formulation is only changed lightly,
 passing the packages through the flavour mechanism to a standard target,
 
 ```
-FLAVOUR_ospackages='bash gcc' /path/to/mkhere/ospackages.sh osdepend have build
+FLAVOUR_ospackages='bash gcc' /path/to/mkhere/ospackages.sh osdepend depend have build
 FLAVOUR_ospackages='bash gcc' /path/to/mkhere/ospackages.sh cpioprefix oslibcpio install
 ```
 
 Here, `osdepend` installs the packages listed in the flavour variable;
+`depend` ensures that no source-code dependencies were forgotten to build;
 `have` installs nothing; `build` sets up links to the installation
 root, which is necessary for listing the files in preparation of packaging.
 
@@ -203,7 +215,7 @@ to a file name (with glob support) per line.  Note that the last line must
 be terminated with a newline too!
 
 ```
-FLAVOUR_osfiles='/bin/bash^J/usr/bin/gcc^J' /path/to/mkhere/osfiles.sh osdepend have build
+FLAVOUR_osfiles='/bin/bash^J/usr/bin/gcc^J' /path/to/mkhere/osfiles.sh osdepend depend have build
 FLAVOUR_osfiles='/bin/bash^J/usr/bin/gcc^J' /path/to/mkhere/osfiles.sh cpioprefix oslibcpio install
 ```
 

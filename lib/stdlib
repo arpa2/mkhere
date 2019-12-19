@@ -87,8 +87,12 @@ do_osdepend () {
 
 # Check dependencies on other source packages
 do_depend () {
-	echo >&2 'Not implemented: Check dependencies on other source packages'
-	exit 1
+	for DEP in $(do_dependencies)
+	do
+		/mkhere/$DEP check
+		EXITCODE=$?
+		[ $EXITCODE -ne 0 ] && exit $EXITCODE
+	done
 }
 
 # Generic do_tar, based on do_list
@@ -123,6 +127,12 @@ do_cpiogzprefix () {
 
 # If not yet downloaded, fetch a first source code update
 do_have () {
+	for DEP in $(do_dependencies)
+	do
+		/mkhere/$DEP have
+		EXITCODE=$?
+		[ $EXITCODE -ne 0 ] && exit $EXITCODE
+	done
 	if [ $(ls -1 "$DIR_SRC" | wc -l) -eq 0 ]
 	then
 		do_update
