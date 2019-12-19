@@ -37,6 +37,11 @@ do_osdependencies () {
 	done
 }
 
+do_check () {
+	# Always out of date
+	return 1;
+}
+
 do_build () {
 	find /* -maxdepth 0 | \
 		while read ROOTNAME

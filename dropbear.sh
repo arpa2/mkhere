@@ -27,18 +27,17 @@ do_osdependencies () {
 	echo -n ''
 }
 
-do_build () {
-	if [ "$DIR_BUILD" -nt "$DIR_SRC/dropbear-${STABLE}" ]
-	then
-		echo 'Reusing build, as it postdates the source'
-	else
-		cd "$DIR_BUILD"
-		empty_dir
-		"$DIR_SRC/dropbear-${STABLE}/configure" --prefix="/usr" && \
-		make && \
-		empty_dir "$DIR_TREE" && \
-		make DESTDIR="$DIR_TREE" install
-	fi
+do_check () {
+	[ "$DIR_BUILD" -nt "$DIR_SRC/dropbear-${STABLE}" ]
+}
+
+do_build2 () {
+	cd "$DIR_BUILD"
+	empty_dir
+	"$DIR_SRC/dropbear-${STABLE}/configure" --prefix="/usr" && \
+	make && \
+	empty_dir "$DIR_TREE" && \
+	make DESTDIR="$DIR_TREE" install
 }
 
 do_list () {

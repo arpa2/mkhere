@@ -31,25 +31,24 @@ do_osdependencies () {
 	echo 'libgpm2'
 }
 
-do_build () {
-	if [ "$DIR_BUILD" -nt "$DIR_SRC/twin.git" ]
-	then
-		echo 'Reusing build, as it postdates the source'
-	else
-		cd "$DIR_BUILD"
-		empty_dir
-		"$DIR_SRC/twin.git/configure" --prefix="/usr" && \
-		make && \
-		empty_dir "$DIR_TREE" && \
-		make DESTDIR="$DIR_TREE" install && \
-		find "$DIR_TREE/usr/lib" -name \*.la -exec rm {} \; && \
-		rm "$DIR_TREE/usr/bin/twin" && \
-		ln -s twin_server "$DIR_TREE/usr/bin/twin"
-		#KEEP:DEBUG#MOVE:2UP#
-		#KEEP:DEBUG# find "$DIR_TREE/usr/lib" -name \*.so* -type f -exec strip {} \; && \
-		#KEEP:DEBUG# find "$DIR_TREE/usr/bin" -type f | grep -v twstart | while read FILE ; do strip $FILE ; done && \
-		#KEEP:DEBUG# rm "$DIR_TREE/usr/bin/"{twcuckoo,twclutter,twdialog,twthreadtest} && \
-	fi
+do_check () {
+	[ "$DIR_BUILD" -nt "$DIR_SRC/twin.git" ]
+}
+
+do_build2 () {
+	cd "$DIR_BUILD"
+	empty_dir
+	"$DIR_SRC/twin.git/configure" --prefix="/usr" && \
+	make && \
+	empty_dir "$DIR_TREE" && \
+	make DESTDIR="$DIR_TREE" install && \
+	find "$DIR_TREE/usr/lib" -name \*.la -exec rm {} \; && \
+	rm "$DIR_TREE/usr/bin/twin" && \
+	ln -s twin_server "$DIR_TREE/usr/bin/twin"
+	#KEEP:DEBUG#MOVE:2UP#
+	#KEEP:DEBUG# find "$DIR_TREE/usr/lib" -name \*.so* -type f -exec strip {} \; && \
+	#KEEP:DEBUG# find "$DIR_TREE/usr/bin" -type f | grep -v twstart | while read FILE ; do strip $FILE ; done && \
+	#KEEP:DEBUG# rm "$DIR_TREE/usr/bin/"{twcuckoo,twclutter,twdialog,twthreadtest} && \
 }
 
 do_list () {

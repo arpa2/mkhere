@@ -24,18 +24,17 @@ do_osdependencies () {
 	echo -n ''
 }
 
-do_build () {
-	if [ "$DIR_BUILD" -nt "$DIR_GIT" ]
-	then
-		echo 'Reusing build, as it postdates the source'
-	else
-		cd "$DIR_BUILD"
-		empty_dir
-		cmake -D CMAKE_INSTALL_PREFIX:PATH=/usr "$DIR_GIT"
-		make && \
-		empty_dir "$DIR_TREE" && \
-		make DESTDIR="$DIR_TREE" install
-	fi
+do_check () {
+	[ "$DIR_BUILD" -nt "$DIR_GIT" ]
+}
+
+do_build2 () {
+	cd "$DIR_BUILD"
+	empty_dir
+	cmake -D CMAKE_INSTALL_PREFIX:PATH=/usr "$DIR_GIT"
+	make && \
+	empty_dir "$DIR_TREE" && \
+	make DESTDIR="$DIR_TREE" install
 }
 
 do_list () {

@@ -280,6 +280,17 @@ do_install () {
 	exit 1
 }
 
+# Define a do_build() if none defined yet
+type do_build >/dev/null 2>/dev/null || \
+do_build () {
+	if do_check
+	then
+		echo 'Reusing build, as it postdates the source'
+	else
+		do_build2
+	fi
+}
+
 
 # Main programming, running the commands in argv[]
 main_do_commands () {

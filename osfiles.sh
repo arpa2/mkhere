@@ -34,6 +34,11 @@ do_osdependencies () {
 	echo -n ''
 }
 
+do_check () {
+	# Always out of date
+	return 1;
+}
+
 do_build () {
 	find /* -maxdepth 0 | \
 		while read ROOTNAME

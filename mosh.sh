@@ -33,18 +33,17 @@ do_osdependencies () {
 	echo libssl-dev
 }
 
-do_build () {
-	if [ "$DIR_BUILD" -nt "$DIR_SRC/mosh-${STABLE}" ]
-	then
-		echo 'Reusing build, as it postdates the source'
-	else
-		cd "$DIR_BUILD"
-		empty_dir
-		"$DIR_SRC/mosh-${STABLE}/configure" --prefix="/usr" && \
-		make && \
-		empty_dir "$DIR_TREE" && \
-		make DESTDIR="$DIR_TREE" install
-	fi
+do_check () {
+	[ "$DIR_BUILD" -nt "$DIR_SRC/mosh-${STABLE}" ]
+}
+
+do_build2 () {
+	cd "$DIR_BUILD"
+	empty_dir
+	"$DIR_SRC/mosh-${STABLE}/configure" --prefix="/usr" && \
+	make && \
+	empty_dir "$DIR_TREE" && \
+	make DESTDIR="$DIR_TREE" install
 }
 
 do_list () {
