@@ -4,6 +4,8 @@
 
 . $(dirname "$0")/lib/stdlib
 
+#TODO# Use $VERSION
+
 do_touch () {
 	touch "$DIR_SRC/dialog"
 }

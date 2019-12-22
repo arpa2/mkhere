@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# hexio build script
+# Quick DER build script
 
 . $(dirname "$0")/lib/stdlib
 
@@ -9,7 +9,7 @@
 do_update () {
 	cd "$DIR_SRC"
 	empty_dir
-	git clone https://github.com/vanrein/hexio hexio.git
+	git clone https://github.com/vanrein/quick-der "$DIR_GIT"
 }
 
 do_touch () {
@@ -21,7 +21,7 @@ do_dependencies () {
 }
 
 do_osdependencies () {
-	echo -n ''
+	echo python3
 }
 
 do_check () {
@@ -31,10 +31,11 @@ do_check () {
 do_build2 () {
 	cd "$DIR_BUILD"
 	empty_dir
-	cmake -D CMAKE_INSTALL_PREFIX:PATH=/usr "$DIR_GIT"
+	cmake "$DIR_GIT"
 	make && \
 	empty_dir "$DIR_TREE" && \
-	make DESTDIR="$DIR_TREE" install
+	make DESTDIR="$DIR_TREE" install && \
+	python3 "$DIR_GIT/setup.py" install
 }
 
 do_list () {

@@ -4,7 +4,7 @@
 
 . $(dirname "$0")/lib/stdlib
 
-# STABLE=0.0.0
+#TODO# Use $VERSION
 
 do_update () {
 	cd "$DIR_SRC"

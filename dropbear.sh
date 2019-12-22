@@ -4,18 +4,18 @@
 
 . $(dirname "$0")/lib/stdlib
 
-STABLE=2019.78
+default_VERSION 2019.78
 
 do_touch () {
-	touch "$DIR_SRC/dropbear-${STABLE}"
+	touch "$DIR_SRC/dropbear-${VERSION}"
 }
 
 do_update () {
 	cd "$DIR_FETCH"
-	wget https://matt.ucc.asn.au/dropbear/releases/dropbear-${STABLE}.tar.bz2
+	wget https://matt.ucc.asn.au/dropbear/releases/dropbear-${VERSION}.tar.bz2
 	cd "$DIR_SRC"
-	empty_dir "$DIR_SRC/dropbear-${STABLE}"
-	tar -xjvf "$DIR_FETCH/dropbear-${STABLE}.tar.bz2"
+	empty_dir "$DIR_SRC/dropbear-${VERSION}"
+	tar -xjvf "$DIR_FETCH/dropbear-${VERSION}.tar.bz2"
 	do_touch
 }
 
@@ -28,13 +28,13 @@ do_osdependencies () {
 }
 
 do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_SRC/dropbear-${STABLE}" ]
+	[ "$DIR_BUILD" -nt "$DIR_SRC/dropbear-${VERSION}" ]
 }
 
 do_build2 () {
 	cd "$DIR_BUILD"
 	empty_dir
-	"$DIR_SRC/dropbear-${STABLE}/configure" --prefix="/usr" && \
+	"$DIR_SRC/dropbear-${VERSION}/configure" --prefix="/usr" && \
 	make && \
 	empty_dir "$DIR_TREE" && \
 	make DESTDIR="$DIR_TREE" install

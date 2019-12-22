@@ -4,18 +4,18 @@
 
 . $(dirname "$0")/lib/stdlib
 
-STABLE=2.8.3
+default_VERSION 2.8.3
 
 do_touch () {
-	touch "$DIR_SRC/knot-${STABLE}"
+	touch "$DIR_SRC/knot-${VERSION}"
 }
 
 do_update () {
 	cd "$DIR_FETCH"
-	wget https://secure.nic.cz/files/knot-dns/knot-${STABLE}.tar.xz
+	wget https://secure.nic.cz/files/knot-dns/knot-${VERSION}.tar.xz
 	cd "$DIR_SRC"
-	empty_dir "$DIR_SRC/knot-${STABLE}"
-	tar -xJvf "$DIR_FETCH/knot-${STABLE}.tar.xz"
+	empty_dir "$DIR_SRC/knot-${VERSION}"
+	tar -xJvf "$DIR_FETCH/knot-${VERSION}.tar.xz"
 	do_touch
 }
 
@@ -31,13 +31,13 @@ do_osdependencies () {
 }
 
 do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_SRC/knot-${STABLE}" ]
+	[ "$DIR_BUILD" -nt "$DIR_SRC/knot-${VERSION}" ]
 }
 
 do_build2 () {
 	cd "$DIR_BUILD"
 	empty_dir
-	"$DIR_SRC/knot-${STABLE}/configure" --prefix="/usr" && \
+	"$DIR_SRC/knot-${VERSION}/configure" --prefix="/usr" && \
 	make && \
 	empty_dir "$DIR_TREE" && \
 	make DESTDIR="$DIR_TREE" install

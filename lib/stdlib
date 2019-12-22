@@ -17,6 +17,7 @@ fi
 # Derive $TARGET and ensure its rootfs
 TARGET=$(basename "$0")
 TARGET=${TARGET%.sh}
+VERSION_TARGET="VERSION_${TARGET}"
 VARIANT_TARGET="VARIANT_${TARGET}"
 FLAVOUR_TARGET="FLAVOUR_${TARGET}"
 if [ "$0" != "/mkhere/$TARGET.sh" ]
@@ -24,6 +25,7 @@ then
 	NEWROOT=$(dirname "$0")/..
 	debug Changing to build rootfs $NEWROOT
 	# Following are useless, without export they don't seem to get here
+	export $VERSION_TARGET
 	export $VARIANT_TARGET
 	export $FLAVOUR_TARGET
 	# Support for last command being "install"
@@ -44,22 +46,40 @@ then
 	fi
 fi
 
-# Derive variables $VARIANT and $FLAVOUR
+# Derive variables $VERSION, $VARIANT and $FLAVOUR
+VERSION=${!VERSION_TARGET}
 VARIANT=${!VARIANT_TARGET}
 FLAVOUR=${!FLAVOUR_TARGET}
-debug Script target is $TARGET, variant is $VARIANT, flavour is $FLAVOUR
-
-# Derive DIR_SRC, DIR_GIT, DIR_BUILD, DIR_TREE and have them
-DIR_FETCH=/dl/${TARGET}
-DIR_SRC=/src/${TARGET}
-DIR_GIT=${DIR_SRC}/${TARGET}.git
-DIR_BUILD=/build/${TARGET}${VARIANT:+-${VARIANT}}
-DIR_TREE=/tree/${TARGET}${VARIANT:+-${VARIANT}}
-mkdir -p "${DIR_TREE}" "${DIR_BUILD}" "${DIR_SRC}" "${DIR_FETCH}"
+debug Script target is $TARGET, version is $VERSION, variant is $VARIANT, flavour is $FLAVOUR
 
 # Strip the TRAILER last line for cpio archives
 strip_cpio_trailer () {
 	sed '$s/07070100000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000B00000000TRAILER!!!\(\x00\)*$//'
+}
+
+# Derive DIR_SRC, DIR_GIT, DIR_BUILD, DIR_TREE and have them
+derive_DIR () {
+	DIR_FETCH=/dl/${TARGET}-${VERSION}
+	DIR_SRC=/src/${TARGET}-${VERSION}
+	DIR_GIT=${DIR_SRC}/${TARGET}-${VERSION}.git
+	DIR_BUILD=/build/${TARGET}-${VERSION}${VARIANT:+-${VARIANT}}
+	DIR_TREE=/tree/${TARGET}-${VERSION}${VARIANT:+-${VARIANT}}
+	mkdir -p "${DIR_TREE}" "${DIR_BUILD}" "${DIR_SRC}" "${DIR_FETCH}"
+}
+derive_DIR
+
+# Setup a default VERSION, VARIANT, TARGET; called from /mkhere/$TARGET.sh
+default_VERSION() {
+	VERSION=${VERSION:-$1}
+	derive_DIR
+}
+default_VARIANT() {
+	VARIANT=${VARIANT:-$1}
+	derive_DIR
+}
+default_FLAVOUR() {
+	FLAVOUR=${FLAVOUR:-$1}
+	derive_DIR
 }
 
 # Utility to erase a directory somewhat safely
@@ -302,8 +322,21 @@ do_build () {
 }
 
 
+# Derive additional PATH info for various applications
+update_paths () {
+	for DEPEND in $(do_dependencies)
+	do
+		PATH=$PATH:/tree/$DEPEND/bin
+		LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}/tree/$DEPEND/usr/lib:/tree/$DEPEND:/usr/local/lib
+		CMAKE_SYSTEM_PREFIX_PATH=${CMAKE_SYSTEM_PREFIX_PATH:+$CMAKE_SYSTEM_PREFIX_PATH\;}/tree/$DEPEND/usr\;/tree/$DEPEND/usr/local
+		echo CMAKE_SYSTEM_PREFIX_PATH:=${CMAKE_SYSTEM_PREFIX_PATH}
+	done
+}
+
+
 # Main programming, running the commands in argv[]
 main_do_commands () {
+	update_paths
 	if [ "$#" -eq 0 ]
 	then
 		echo >&2 "Please supply one or more subcommands to $0"

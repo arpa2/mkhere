@@ -5,18 +5,18 @@
 . $(dirname "$0")/lib/stdlib
 
 #Note: Debian has a 0.12.21 which is not released?!?
-STABLE=0.12.20
+default_VERSION 0.12.20
 
 do_touch () {
-	touch "$DIR_SRC/lrzsz-${STABLE}"
+	touch "$DIR_SRC/lrzsz-${VERSION}"
 }
 
 do_update () {
 	cd "$DIR_FETCH"
-	wget https://ohse.de/uwe/releases/lrzsz-${STABLE}.tar.gz
+	wget https://ohse.de/uwe/releases/lrzsz-${VERSION}.tar.gz
 	cd "$DIR_SRC"
-	empty_dir "$DIR_SRC/lrzsz-${STABLE}"
-	tar -xzvf "$DIR_FETCH/lrzsz-${STABLE}.tar.gz"
+	empty_dir "$DIR_SRC/lrzsz-${VERSION}"
+	tar -xzvf "$DIR_FETCH/lrzsz-${VERSION}.tar.gz"
 	do_touch
 }
 
@@ -29,13 +29,13 @@ do_osdependencies () {
 }
 
 do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_SRC/lrzsz-${STABLE}" ]
+	[ "$DIR_BUILD" -nt "$DIR_SRC/lrzsz-${VERSION}" ]
 }
 
 do_build2 () {
 	cd "$DIR_BUILD"
 	empty_dir
-	"$DIR_SRC/lrzsz-${STABLE}/configure" --prefix="/usr" && \
+	"$DIR_SRC/lrzsz-${VERSION}/configure" --prefix="/usr" && \
 	make && \
 	empty_dir "$DIR_TREE" && \
 	make DESTDIR="$DIR_TREE" install

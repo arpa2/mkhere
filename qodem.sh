@@ -4,18 +4,18 @@
 
 . $(dirname "$0")/lib/stdlib
 
-STABLE=1.0.0
+default_VERSION 1.0.0
 
 do_touch () {
-	touch "$DIR_SRC/qodem-${STABLE}"
+	touch "$DIR_SRC/qodem-${VERSION}"
 }
 
 do_update () {
 	cd "$DIR_FETCH"
-	wget -O qodem-${STABLE}.tar.gz https://github.com/klamonte/qodem/archive/v${STABLE}.tar.gz
+	wget -O qodem-${VERSION}.tar.gz https://github.com/klamonte/qodem/archive/v${VERSION}.tar.gz
 	cd "$DIR_SRC"
-	empty_dir "$DIR_SRC/qodem-${STABLE}"
-	tar -xzvf "$DIR_FETCH/qodem-${STABLE}.tar.gz"
+	empty_dir "$DIR_SRC/qodem-${VERSION}"
+	tar -xzvf "$DIR_FETCH/qodem-${VERSION}.tar.gz"
 	do_touch
 }
 
@@ -29,15 +29,15 @@ do_osdependencies () {
 }
 
 do_check ()  {
-	[ "$DIR_BUILD" -nt "$DIR_SRC/qodem-${STABLE}" ]
+	[ "$DIR_BUILD" -nt "$DIR_SRC/qodem-${VERSION}" ]
 }
 
 do_build2 () {
 	cd "$DIR_BUILD"
 	empty_dir
 	# Horrible code, cannot configure outside of builddir
-	# "$DIR_SRC/qodem-${STABLE}/configure" --srcdir="$DIR_SRC/qodem-${STABLE}" --prefix="/usr" && \
-	cp -pr "$DIR_SRC/qodem-${STABLE}"/* . && \
+	# "$DIR_SRC/qodem-${VERSION}/configure" --srcdir="$DIR_SRC/qodem-${VERSION}" --prefix="/usr" && \
+	cp -pr "$DIR_SRC/qodem-${VERSION}"/* . && \
 	./autogen.sh && \
 	./configure --prefix="/usr" && \
 	make && \

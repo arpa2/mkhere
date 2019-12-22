@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# hexio build script
+# SteamWorks build script
 
 . $(dirname "$0")/lib/stdlib
 
@@ -9,7 +9,7 @@
 do_update () {
 	cd "$DIR_SRC"
 	empty_dir
-	git clone https://github.com/vanrein/hexio hexio.git
+	git clone https://gitlab.com/arpa2/steamworks arpa2steamworks.git
 }
 
 do_touch () {
@@ -17,7 +17,7 @@ do_touch () {
 }
 
 do_dependencies () {
-	echo -n ''
+	echo 'arpa2cm'
 }
 
 do_osdependencies () {
@@ -31,7 +31,9 @@ do_check () {
 do_build2 () {
 	cd "$DIR_BUILD"
 	empty_dir
-	cmake -D CMAKE_INSTALL_PREFIX:PATH=/usr "$DIR_GIT"
+	cmake -D CMAKE_INSTALL_PREFIX:PATH=/usr \
+		-D CMAKE_FIND_ROOT_PATH=/tree/arpa2cm/usr/local \
+		"$DIR_GIT"
 	make && \
 	empty_dir "$DIR_TREE" && \
 	make DESTDIR="$DIR_TREE" install

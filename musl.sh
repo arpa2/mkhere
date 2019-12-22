@@ -4,18 +4,18 @@
 
 . $(dirname "$0")/lib/stdlib
 
-STABLE=1.1.23
+default_VERSION 1.1.23
 
 do_touch () {
-	touch "$DIR_SRC/musl-${STABLE}"
+	touch "$DIR_SRC/musl-${VERSION}"
 }
 
 do_update () {
 	cd "$DIR_FETCH"
-	wget https://www.musl-libc.org/releases/musl-${STABLE}.tar.gz
+	wget https://www.musl-libc.org/releases/musl-${VERSION}.tar.gz
 	cd "$DIR_SRC"
-	empty_dir "$DIR_SRC/musl-${STABLE}"
-	tar -xzvf "$DIR_FETCH/musl-${STABLE}.tar.gz"
+	empty_dir "$DIR_SRC/musl-${VERSION}"
+	tar -xzvf "$DIR_FETCH/musl-${VERSION}.tar.gz"
 	do_touch
 }
 
@@ -28,13 +28,13 @@ do_osdependencies () {
 }
 
 do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_SRC/musl-${STABLE}" ]
+	[ "$DIR_BUILD" -nt "$DIR_SRC/musl-${VERSION}" ]
 }
 
 do_build2 () {
 	cd "$DIR_BUILD"
 	empty_dir
-	"$DIR_SRC/musl-${STABLE}/configure" --prefix="/usr" && \
+	"$DIR_SRC/musl-${VERSION}/configure" --prefix="/usr" && \
 	make && \
 	empty_dir "$DIR_TREE" && \
 	make DESTDIR="$DIR_TREE" install
