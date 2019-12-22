@@ -10,6 +10,7 @@ do_update () {
 	cd "$DIR_SRC"
 	empty_dir
 	git clone https://github.com/vanrein/6bed4 "$DIR_GIT"
+	# cd "$DIR_GIT" ; git checkout $VERSION
 }
 
 do_touch () {

@@ -4,12 +4,13 @@
 
 . $(dirname "$0")/lib/stdlib
 
-#TODO# Use $VERSION
+default_VERSION version-0.7
 
 do_update () {
 	cd "$DIR_SRC"
 	empty_dir
-	git clone https://github.com/arpa2/arpa2cm "$DIR_GIT"
+	git clone https://gitlab.com/arpa2/arpa2cm "$DIR_GIT"
+	cd "$DIR_GIT" ; git checkout $VERSION
 }
 
 do_touch () {

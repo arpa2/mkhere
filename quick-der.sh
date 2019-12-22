@@ -4,12 +4,13 @@
 
 . $(dirname "$0")/lib/stdlib
 
-#TODO# Use $VERSION
+default_VERSION version-1.3.0
 
 do_update () {
 	cd "$DIR_SRC"
 	empty_dir
 	git clone https://github.com/vanrein/quick-der "$DIR_GIT"
+	cd "$DIR_GIT" ; git checkout $VERSION
 }
 
 do_touch () {

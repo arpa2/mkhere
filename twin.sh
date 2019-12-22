@@ -4,13 +4,14 @@
 
 . $(dirname "$0")/lib/stdlib
 
-#TODO# Use $VERSION
+default_VERSION 88b90b73e1d4b28f07e6a9471e32534b65d251ef
 
 do_update () {
 	cd "$DIR_SRC"
 	empty_dir
-	git clone https://github.com/cosmos72/twin twin.git
-	cd twin.git
+	git clone https://github.com/cosmos72/twin "$DIR_GIT"
+	cd "$DIR_GIT"
+	git checkout $VERSION
 	git remote add vanrein https://github.com/vanrein/twin
 	# git fetch vanrein pr-multiline-menu
 	# git merge vanrein/pr-multiline-menu
@@ -19,7 +20,7 @@ do_update () {
 }
 
 do_touch () {
-	touch "$DIR_SRC/twin.git"
+	touch "$DIR_GIT"
 }
 
 do_dependencies () {
@@ -32,13 +33,13 @@ do_osdependencies () {
 }
 
 do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_SRC/twin.git" ]
+	[ "$DIR_BUILD" -nt "$DIR_GIT" ]
 }
 
 do_build2 () {
 	cd "$DIR_BUILD"
 	empty_dir
-	"$DIR_SRC/twin.git/configure" --prefix="/usr" && \
+	"$DIR_GIT/configure" --prefix="/usr" && \
 	make && \
 	empty_dir "$DIR_TREE" && \
 	make DESTDIR="$DIR_TREE" install && \

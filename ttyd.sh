@@ -4,12 +4,13 @@
 
 . $(dirname "$0")/lib/stdlib
 
-#TODO# Use $VERSION
+default_VERSION 1.5.2
 
 do_update () {
 	cd "$DIR_SRC"
 	empty_dir
-	git clone https://github.com/tsl0922/ttyd ttyd.git
+	git clone https://github.com/tsl0922/ttyd "$DIR_GIT"
+	cd "$DIR_GIT" ; git checkout $VERSION
 }
 
 do_touch () {
