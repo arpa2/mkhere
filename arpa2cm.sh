@@ -10,7 +10,7 @@ do_update () {
 	cd "$DIR_SRC"
 	empty_dir
 	git clone https://gitlab.com/arpa2/arpa2cm "$DIR_GIT"
-	cd "$DIR_GIT" ; git checkout $VERSION
+	cd "$DIR_GIT" ; git reset $VERSION
 }
 
 do_touch () {

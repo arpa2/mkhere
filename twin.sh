@@ -11,7 +11,7 @@ do_update () {
 	empty_dir
 	git clone https://github.com/cosmos72/twin "$DIR_GIT"
 	cd "$DIR_GIT"
-	git checkout $VERSION
+	git reset $VERSION
 	git remote add vanrein https://github.com/vanrein/twin
 	# git fetch vanrein pr-multiline-menu
 	# git merge vanrein/pr-multiline-menu
