@@ -99,6 +99,11 @@ empty_dir () {
 	esac
 }
 
+# Utility to print lines only when they are new (without sort)
+unique () {
+	awk '{if(!seen[$0]++)print}'
+}
+
 # Generic subcommand for installing dependencies
 do_osdepend () {
 	. $(dirname "$0")/lib/pkglib
@@ -199,7 +204,7 @@ do_oslibs2 () {
 						-e 's/^[ \t]*//' \
 						-e 's/ .*//' \
 						-e '/^linux-vdso\.so.*/d' | \
-					sort | uniq
+					unique
 			fi
 		done
 	) ) )

@@ -80,7 +80,7 @@ do_list () {
 			done
 	done | \
 	# Remove duplicates caused by link traversal
-	sort | uniq
+	unique
 }
 
 # The list of OS libraries will be split out per OS package
@@ -98,7 +98,7 @@ do_oslibs () {
 		cat "$DIR_BUILD/mkhere-oslibs-$PKG.txt"
 	done | \
 	# Remove duplicates caused by link traversal
-	sort | uniq
+	unique
 	FLAVOUR_ospackages="$SAVE_ospackages"
 }
 
