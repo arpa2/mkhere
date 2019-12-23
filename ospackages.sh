@@ -83,6 +83,25 @@ do_list () {
 	sort | uniq
 }
 
+# The list of OS libraries will be split out per OS package
+do_oslibs () {
+	SAVE_ospackages="$FLAVOUR_ospackages"
+	for PKG in $SAVE_ospackages
+	do
+		if [ ! -r "$DIR_BUILD/mkhere-oslibs-$PKG.txt" ]
+		then
+			FLAVOUR_ospackages="$PKG"
+			do_oslibs2
+			mv "$DIR_BUILD/mkhere-oslibs.txt" \
+			   "$DIR_BUILD/mkhere-oslibs-$PKG.txt"
+		fi
+		cat "$DIR_BUILD/mkhere-oslibs-$PKG.txt"
+	done | \
+	# Remove duplicates caused by link traversal
+	sort | uniq
+	FLAVOUR_ospackages="$SAVE_ospackages"
+}
+
 do_variants () {
 	echo -n ''
 }
@@ -96,6 +115,8 @@ do_flavours () {
 do_osupdate () {
 	. $(dirname "$0")/lib/pkglib
 	pkg_update
+	find /build             -name mkhere-osdeps.txt   -exec rm {} \;
+	find /build/ospackages* -name mkhere-osdeps-*.txt -exec rm {} \;
 }
 
 main_do_commands "$@"

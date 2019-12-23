@@ -274,6 +274,7 @@ do_oslibs2 () {
 }
 
 # Report OS libraries from the build system that are needed for a package
+type do_oslibs >/dev/null 2>/dev/null || \
 do_oslibs () {
 	if [ ! -r "$DIR_BUILD/mkhere-oslibs.txt" ]
 	then
