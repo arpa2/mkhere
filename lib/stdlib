@@ -101,7 +101,17 @@ empty_dir () {
 
 # Utility to print lines only when they are new (without sort)
 unique () {
-	awk '{if(!seen[$0]++)print}'
+	# awk '{if(!seen[$0]++)print}'
+	declare -A seen
+	while read X
+	do
+		if [ -z ${seen["$X"]} ]
+		then
+			echo "$X"
+			seen["$X"]=1
+		fi
+	done
+	unset seen
 }
 
 # Generic subcommand for installing dependencies
