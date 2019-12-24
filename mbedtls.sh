@@ -6,10 +6,6 @@
 
 default_VERSION 2.16.2
 
-do_touch () {
-	touch "$DIR_SRC/mbedtls-${VERSION}"
-}
-
 do_update () {
 	cd "$DIR_FETCH"
 	empty_dir
@@ -26,10 +22,6 @@ do_dependencies () {
 
 do_osdependencies () {
 	echo -n ''
-}
-
-do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_SRC/mbedtls-${VERSION}" ]
 }
 
 do_build2 () {

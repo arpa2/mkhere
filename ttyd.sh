@@ -13,10 +13,6 @@ do_update () {
 	cd "$DIR_GIT" ; git reset $VERSION
 }
 
-do_touch () {
-	touch "$DIR_GIT"
-}
-
 do_dependencies () {
 	echo -n ''
 }
@@ -28,10 +24,6 @@ do_osdependencies () {
 	echo 'libwebsockets-dev'
 	echo 'libjson-c-dev'
 	echo 'libssl-dev'
-}
-
-do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_GIT" ]
 }
 
 do_build2 () {

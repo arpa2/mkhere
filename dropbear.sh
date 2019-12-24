@@ -6,10 +6,6 @@
 
 default_VERSION 2019.78
 
-do_touch () {
-	touch "$DIR_SRC/dropbear-${VERSION}"
-}
-
 do_update () {
 	cd "$DIR_FETCH"
 	wget https://matt.ucc.asn.au/dropbear/releases/dropbear-${VERSION}.tar.bz2
@@ -25,10 +21,6 @@ do_dependencies () {
 
 do_osdependencies () {
 	echo -n ''
-}
-
-do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_SRC/dropbear-${VERSION}" ]
 }
 
 do_build2 () {

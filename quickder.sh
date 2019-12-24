@@ -13,20 +13,12 @@ do_update () {
 	cd "$DIR_GIT" ; git reset $VERSION
 }
 
-do_touch () {
-	touch "$DIR_GIT"
-}
-
 do_dependencies () {
 	echo -n ''
 }
 
 do_osdependencies () {
 	echo python3
-}
-
-do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_GIT" ]
 }
 
 do_build2 () {

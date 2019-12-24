@@ -6,10 +6,6 @@
 
 default_VERSION 1.7.3.3
 
-do_touch () {
-	touch "$DIR_SRC/socat-${VERSION}"
-}
-
 do_update () {
 	cd "$DIR_FETCH"
 	wget http://www.dest-unreach.org/socat/download/socat-${VERSION}.tar.gz
@@ -25,10 +21,6 @@ do_dependencies () {
 
 do_osdependencies () {
 	echo -n ''
-}
-
-do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_SRC/socat-${VERSION}" ]
 }
 
 do_build2 () {

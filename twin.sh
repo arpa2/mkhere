@@ -19,10 +19,6 @@ do_update () {
 	git merge --no-edit vanrein/rvrmods
 }
 
-do_touch () {
-	touch "$DIR_GIT"
-}
-
 do_dependencies () {
 	echo -n ''
 }
@@ -30,10 +26,6 @@ do_dependencies () {
 do_osdependencies () {
 	echo 'libgpm-dev'
 	echo 'libgpm2'
-}
-
-do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_GIT" ]
 }
 
 do_build2 () {

@@ -335,6 +335,23 @@ do_install () {
 	exit 1
 }
 
+# Generic touch of $DIR_SRC, which is version-specific to the source code
+type do_touch >/dev/null 2>/dev/null || \
+do_touch () {
+	if [ ! -d "$DIR_SRC" ]
+	then
+		echo >&2 "You did not \"have\" source code for $TARGET not yet"
+		exit 1
+	fi
+	touch "$DIR_SRC"
+}
+
+# Generic check if building is needed; includes test for source directory
+type do_check >/dev/null 2>/dev/null || \
+do_check () {
+	[ -d "$DIR_SRC" ] && [ "$DIR_BUILD" -nt "$DIR_SRC" ]
+}
+
 # Define a do_build() if none defined yet
 type do_build >/dev/null 2>/dev/null || \
 do_build () {

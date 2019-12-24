@@ -6,10 +6,6 @@
 
 default_VERSION 1.1.23
 
-do_touch () {
-	touch "$DIR_SRC/musl-${VERSION}"
-}
-
 do_update () {
 	cd "$DIR_FETCH"
 	wget https://www.musl-libc.org/releases/musl-${VERSION}.tar.gz
@@ -25,10 +21,6 @@ do_dependencies () {
 
 do_osdependencies () {
 	echo -n ''
-}
-
-do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_SRC/musl-${VERSION}" ]
 }
 
 do_build2 () {

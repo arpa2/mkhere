@@ -6,10 +6,6 @@
 
 default_VERSION 1.3.2
 
-do_touch () {
-	touch "$DIR_SRC/mosh-${VERSION}"
-}
-
 do_update () {
 	cd "$DIR_FETCH"
 	wget https://mosh.org/mosh-${VERSION}.tar.gz
@@ -31,10 +27,6 @@ do_osdependencies () {
 	echo zlib1g-dev
 	echo libutempter-dev
 	echo libssl-dev
-}
-
-do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_SRC/mosh-${VERSION}" ]
 }
 
 do_build2 () {

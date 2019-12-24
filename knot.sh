@@ -6,17 +6,12 @@
 
 default_VERSION 2.8.3
 
-do_touch () {
-	touch "$DIR_SRC/knot-${VERSION}"
-}
-
 do_update () {
 	cd "$DIR_FETCH"
 	wget https://secure.nic.cz/files/knot-dns/knot-${VERSION}.tar.xz
 	cd "$DIR_SRC"
 	empty_dir "$DIR_SRC/knot-${VERSION}"
 	tar -xJvf "$DIR_FETCH/knot-${VERSION}.tar.xz"
-	do_touch
 }
 
 do_dependencies () {
@@ -28,10 +23,6 @@ do_osdependencies () {
 	echo liburcu-dev
 	echo libedit-dev
 	echo liblmdb-dev
-}
-
-do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_SRC/knot-${VERSION}" ]
 }
 
 do_build2 () {

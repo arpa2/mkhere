@@ -6,10 +6,6 @@
 
 #TODO# Use $VERSION
 
-do_touch () {
-	touch "$DIR_SRC/dialog"
-}
-
 do_update () {
 	cd "$DIR_FETCH"
 	# Note: unversioned download...
@@ -28,10 +24,6 @@ do_dependencies () {
 
 do_osdependencies () {
 	echo -n ''
-}
-
-do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_SRC/dialog" ]
 }
 
 do_build2 () {

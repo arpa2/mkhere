@@ -6,10 +6,6 @@
 
 default_VERSION 1.0.0
 
-do_touch () {
-	touch "$DIR_SRC/qodem-${VERSION}"
-}
-
 do_update () {
 	cd "$DIR_FETCH"
 	wget -O qodem-${VERSION}.tar.gz https://github.com/klamonte/qodem/archive/v${VERSION}.tar.gz
@@ -26,10 +22,6 @@ do_dependencies () {
 do_osdependencies () {
 	echo libsdl-dev
 	echo libncurses-dev
-}
-
-do_check ()  {
-	[ "$DIR_BUILD" -nt "$DIR_SRC/qodem-${VERSION}" ]
 }
 
 do_build2 () {

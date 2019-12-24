@@ -7,10 +7,6 @@
 #Note: Debian has a 0.12.21 which is not released?!?
 default_VERSION 0.12.20
 
-do_touch () {
-	touch "$DIR_SRC/lrzsz-${VERSION}"
-}
-
 do_update () {
 	cd "$DIR_FETCH"
 	wget https://ohse.de/uwe/releases/lrzsz-${VERSION}.tar.gz
@@ -26,10 +22,6 @@ do_dependencies () {
 
 do_osdependencies () {
 	echo -n ''
-}
-
-do_check () {
-	[ "$DIR_BUILD" -nt "$DIR_SRC/lrzsz-${VERSION}" ]
 }
 
 do_build2 () {
