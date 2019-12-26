@@ -41,6 +41,21 @@ esac
 
 
 #
+# Form an associative array for translations
+#
+unset pkg_xlate
+declare -A pkg_xlate
+if [ -r $(dirname "$0")/xlate/$PKGLIB_TYPE ]
+then
+	cat $(dirname "$0")/xlate/$PKGLIB_TYPE |
+	while read KEY SUBSTITUTES
+	do
+		pkg_xlate["$KEY"]="$SUBSTITUTES"
+	done
+fi
+
+
+#
 # Obliged functions to implement:
 #
 # pkg_install x y z --> install packages named x, y and z.
@@ -79,6 +94,8 @@ fi
 if [ $PKGLIB_TYPE == msys ]
 then
 
+	#TODO# use pkg_xlate[]
+
 	pkg_install() {
 		ARGV=()
 		for ARGI in "$@"
@@ -106,6 +123,8 @@ fi
 
 if [ $PKGLIB_TYPE == openbsd ]
 then
+
+	#TODO# use pkg_xlate[]
 
 	pkg_install() {
 		pkg_add "$@"
