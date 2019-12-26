@@ -1,0 +1,96 @@
+# Kernel library
+#
+# What constitutes a kernel and its added files is specific to the OS.
+# This library switches to support these two general concepts.
+#
+# This optionally loaded library helps to produce the things commonly
+# expected in a boot system, namely a kernel image and additional data,
+# for which we consider a root file system the most interesting option.
+# Kernel modules are likely the most important aspect of such root file
+# systems, and this concept spans over multiple OS types.
+#
+# From: Rick van Rein <rick@openfortress.nl>
+
+
+# Determine OS-type.
+#
+case $(uname -a) in
+Linux\ *)
+	ostype=linux
+	;;
+FreeBSD\ *)
+	ostype=freebsd
+	echo >&2 'No kernel support for FreeBSD yet'
+	exit 1
+	;;
+#TODO# Check this string
+OpenBSD\ *)
+	ostype=openbsd
+	echo >&2 'No kernel support for OpenBSD yet'
+	exit 1
+	;;
+Darwin\ *)
+	ostype=macosx
+	;;
+*)
+	echo >&2 'Operating system not recognised in "uname -v" output'
+	exit 1
+	;;
+esac
+
+
+# Determine the versions of the kernel, according to constraints
+# in $VERSION_oskernel and $VARIANT_oskernel.  If no kernel can be
+# found, report an error and exit in a tantrum.
+#
+kernel_files() {
+	GOTTEN=0
+	for CANDIDATE in $(ls -1 /boot/vmlinuz-${VERSION_oskernel:+$VERSION_oskernel-}*)
+	do
+		for REQUISITE in $VARIANT_oskernel
+		do
+			PATN="(-$REQUISITE-[^/]*|-$REQUISITE)\\$"
+			if [ ! $CANDIDATE =~ $PATN ]
+			then
+				CANDIDATE=
+				break
+			fi
+		done
+		if [ -n $CANDIDATE ]
+		then
+			echo "$CANDIDATE"
+			GOTTEN=1
+		fi
+	done
+	if [ $GOTTEN == 0 ]
+	then
+		echo >&2 'Failed to find a suitable kernel'
+		exit 1
+	fi
+}
+
+
+# Kernel versions translate to kernel modules, based on their mentioning
+# in $FLAVOUR_oskernelmodules.
+#
+kernel_modulefiles() {
+	if [ -z "$FLAVOUR_oskernelmodules" ]
+	then
+		echo >&2 'Please set FLAVOUR_oskernelmodules to a list of module names'
+		exit 1
+	fi
+	kernel_files | \
+	while read KERNEL
+	do
+		KVER=$(basename "$KERNEL")
+		KVER=${KVER#vmlinuz-}
+		for MOD in $FLAVOUR_oskernelmodules
+		do
+			#TODO# Start a tantrum when no module is found
+			find "/lib/modules/$KVER" -name "$MOD.ko"
+			#TODO# Recursive dependencies, much like oslibs
+			#TODO# Read modinfo lines "depends:   mod1,mod2,mod3"
+		done
+	done
+}
+
