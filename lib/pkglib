@@ -53,6 +53,18 @@ then
 		pkg_xlate["$KEY"]="$SUBSTITUTES"
 	done
 fi
+#
+OUTPUT=()
+for PKG in "$@"
+do
+	if $PKG in pkg_xlate
+	then
+		OUTPUT+=( $pkg_xlate[$PKG] )
+	else
+		OUTPUT+=( $PKG )
+	fi
+done
+set -- $OUTPUT
 
 
 #
@@ -94,8 +106,6 @@ fi
 if [ $PKGLIB_TYPE == msys ]
 then
 
-	#TODO# use pkg_xlate[]
-
 	pkg_install() {
 		ARGV=()
 		for ARGI in "$@"
@@ -123,8 +133,6 @@ fi
 
 if [ $PKGLIB_TYPE == openbsd ]
 then
-
-	#TODO# use pkg_xlate[]
 
 	pkg_install() {
 		pkg_add "$@"
