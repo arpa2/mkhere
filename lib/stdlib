@@ -277,12 +277,12 @@ do_oslibs2 () {
 	ALLFILES=()
 	for FILE in ${EXTREFS[@]}
 	do
-		echo "$FILE"
+		echo "${FILE#/}"
 		# ls -l "$FILE"
 		while [ -L "$FILE" ]
 		do
 			FILE=$(readlink -f "$FILE")
-			echo "$FILE"
+			echo "${FILE#/}"
 			# ls -l "$FILE"
 		done
 	done > "$DIR_BUILD/mkhere-oslibs.txt"
