@@ -24,7 +24,7 @@ do_osdependencies () {
 	echo libncurses-dev
 }
 
-do_build2 () {
+do2_build () {
 	cd "$DIR_BUILD"
 	empty_dir
 	# Horrible code, cannot configure outside of builddir

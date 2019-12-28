@@ -26,7 +26,7 @@ do_osdependencies () {
 	echo 'libssl-dev'
 }
 
-do_build2 () {
+do2_build () {
 	cd "$DIR_BUILD"
 	empty_dir
 	cmake -D CMAKE_INSTALL_PREFIX:PATH=/usr "$DIR_GIT"

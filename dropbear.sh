@@ -23,7 +23,7 @@ do_osdependencies () {
 	echo -n ''
 }
 
-do_build2 () {
+do2_build () {
 	cd "$DIR_BUILD"
 	empty_dir
 	"$DIR_SRC/dropbear-${VERSION}/configure" --prefix="/usr" && \

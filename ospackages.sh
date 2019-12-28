@@ -91,7 +91,7 @@ do_oslibs () {
 		if [ ! -r "$DIR_BUILD/mkhere-oslibs-$PKG.txt" ]
 		then
 			FLAVOUR_ospackages="$PKG"
-			do_oslibs2
+			do2_oslibs
 			mv "$DIR_BUILD/mkhere-oslibs.txt" \
 			   "$DIR_BUILD/mkhere-oslibs-$PKG.txt"
 		fi

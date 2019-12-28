@@ -25,7 +25,7 @@ do_osdependencies () {
 	echo liblmdb-dev
 }
 
-do_build2 () {
+do2_build () {
 	cd "$DIR_BUILD"
 	empty_dir
 	"$DIR_SRC/knot-${VERSION}/configure" --prefix="/usr" && \

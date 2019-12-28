@@ -27,7 +27,7 @@ do_osdependencies () {
 	echo libkrb5-dev
 }
 
-do_build2 () {
+do2_build () {
 	cd "$DIR_BUILD"
 	empty_dir
 	# To get .ez_files, need to --upgrade and install one by one

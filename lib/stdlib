@@ -196,7 +196,7 @@ _mkset () {
 }
 
 # Find OS libraries from the build system that are needed for a package
-do_oslibs2 () {
+do2_oslibs () {
 	LIBDIRS=$(
 		cat /etc/ld.so.conf /etc/ld.so.conf.d/* | \
 		sed -e 's/#.*$//' -e '/^[ \t]*$/d' -e '/^include[ \t].*/d'
@@ -293,7 +293,7 @@ type do_oslibs >/dev/null 2>/dev/null || \
 do_oslibs () {
 	if [ ! -r "$DIR_BUILD/mkhere-oslibs.txt" ]
 	then
-		do_oslibs2
+		do2_oslibs
 	fi
 	cat "$DIR_BUILD/mkhere-oslibs.txt"
 }
@@ -360,7 +360,7 @@ do_build () {
 		echo 'Reusing build, as it postdates the source'
 	else
 		rm -f "$DIR_BUILD/mkhere-oslibs.txt"
-		do_build2
+		do2_build
 	fi
 }
 
