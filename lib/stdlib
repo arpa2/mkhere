@@ -14,16 +14,40 @@ else
 	debug () { echo -n ''; }
 fi
 
+# Find the name of an alternative to everything in root
+# Usage: ln -s /var/cache/mkhere-altcache lib/altcache
+ALTCACHE=$(readlink $(dirname "$0")"/lib/altcache" || echo '')
+debug "Loaded ALTCACHE=\"$ALTCACHE\" from $(dirname "$0")/lib/altcache"
+
 # Derive $TARGET and ensure its rootfs
 TARGET=$(basename "$0")
 TARGET=${TARGET%.sh}
 VERSION_TARGET="VERSION_${TARGET}"
 VARIANT_TARGET="VARIANT_${TARGET}"
 FLAVOUR_TARGET="FLAVOUR_${TARGET}"
-if [ "$0" != "/mkhere/$TARGET.sh" ]
+if [ "$0" != "$ALTCACHE/mkhere/$TARGET.sh" ]
 then
-	NEWROOT=$(dirname "$0")/..
-	debug Changing to build rootfs $NEWROOT
+	# Find the new root directory and test it
+	if [ -z "$ALTCACHE" ]
+	then
+		NEWROOT="$(dirname "$0")/.."
+	else
+		TRAILER="${ALTCACHE}/mkhere/${TARGET}.sh"
+		PREFIXLEN=$[${#0}-${#TRAILER}]
+		NEWROOT="${0:0:$PREFIXLEN}"
+		debug "Comparing \"${0:$PREFIXLEN}\" to \"${TRAILER}\""
+		if [ ! "${0:$PREFIXLEN}" = "${TRAILER}" ]
+		then
+			echo >&2 "Path \"$0\" does not have expected trailer \"${TRAILER}\""
+			exit 1
+		fi
+	fi
+	debug Changing to build rootfs \"$NEWROOT\"
+	if [ ! -x "$NEWROOT/$ALTCACHE/mkhere/$TARGET.sh" ]
+	then
+		echo >&2 "Error: No \"$ALTCACHE/mkhere/$TARGET.sh\" script under \"$NEWROOT\""
+		exit 1
+	fi
 	# Following are useless, without export they don't seem to get here
 	export $VERSION_TARGET
 	export $VARIANT_TARGET
@@ -33,7 +57,7 @@ then
 	then
 		set -- "${@:1:$(($#-1))}"   # Drop last word from $@
 		# Install after after running the command to form cpio archive
-		chroot "$NEWROOT" /mkhere/$TARGET.sh "$@" | \
+		chroot "$NEWROOT" "$ALTCACHE/mkhere/$TARGET.sh" "$@" | \
 			cpio -i \
 				--no-absolute-filenames \
 				--make-directories \
@@ -42,7 +66,7 @@ then
 		exit $?
 	else
 		# No install -- just run the command
-		exec chroot "$NEWROOT" /mkhere/$TARGET.sh "$@"
+		exec chroot "$NEWROOT" "$ALTCACHE/mkhere/$TARGET.sh" "$@"
 	fi
 fi
 
@@ -59,27 +83,23 @@ strip_cpio_trailer () {
 
 # Derive DIR_SRC, DIR_GIT, DIR_BUILD, DIR_TREE and have them
 derive_DIR () {
-	DIR_FETCH=/dl/${TARGET}-${VERSION}
-	DIR_SRC=/src/${TARGET}-${VERSION}
+	DIR_FETCH=${ALTCACHE}/dl/${TARGET}-${VERSION}
+	DIR_SRC=${ALTCACHE}/src/${TARGET}-${VERSION}
 	DIR_GIT=${DIR_SRC}/${TARGET}-${VERSION}.git
-	DIR_BUILD=/build/${TARGET}-${VERSION}${VARIANT:+-${VARIANT}}
-	DIR_TREE=/tree/${TARGET}-${VERSION}${VARIANT:+-${VARIANT}}
+	DIR_BUILD=${ALTCACHE}/build/${TARGET}-${VERSION}${VARIANT:+-${VARIANT}}
+	DIR_TREE=${ALTCACHE}/tree/${TARGET}-${VERSION}${VARIANT:+-${VARIANT}}
 	mkdir -p "${DIR_TREE}" "${DIR_BUILD}" "${DIR_SRC}" "${DIR_FETCH}"
 }
-derive_DIR
 
 # Setup a default VERSION, VARIANT, TARGET; called from /mkhere/$TARGET.sh
 default_VERSION() {
 	VERSION=${VERSION:-$1}
-	derive_DIR
 }
 default_VARIANT() {
 	VARIANT=${VARIANT:-$1}
-	derive_DIR
 }
 default_FLAVOUR() {
 	FLAVOUR=${FLAVOUR:-$1}
-	derive_DIR
 }
 
 # Utility to erase a directory somewhat safely
@@ -254,7 +274,7 @@ do2_oslibs () {
 				# It is understood that dependent libraries
 				# will be installed by the caller anyway.
 				# This is hoping that flavours will be okay.
-				/tree/*)
+				${ALTCACHE}/tree/*)
 					# echo >&2 DEBUG: Peer $LIBFILE
 					;;
 				# References to the base system are mentioned.
@@ -369,9 +389,9 @@ do_build () {
 update_paths () {
 	for DEPEND in $(do_dependencies)
 	do
-		PATH=$PATH:/tree/$DEPEND/bin
-		LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}/tree/$DEPEND/usr/lib:/tree/$DEPEND:/usr/local/lib
-		CMAKE_SYSTEM_PREFIX_PATH=${CMAKE_SYSTEM_PREFIX_PATH:+$CMAKE_SYSTEM_PREFIX_PATH\;}/tree/$DEPEND/usr\;/tree/$DEPEND/usr/local
+		PATH=$PATH:${ALTCACHE}/tree/$DEPEND/bin
+		LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}${ALTCACHE}/tree/$DEPEND/usr/lib:${ALTCACHE}/tree/$DEPEND:/usr/local/lib
+		CMAKE_SYSTEM_PREFIX_PATH=${CMAKE_SYSTEM_PREFIX_PATH:+$CMAKE_SYSTEM_PREFIX_PATH\;}${ALTCACHE}/tree/$DEPEND/usr\;${ALTCACHE}/tree/$DEPEND/usr/local
 		echo CMAKE_SYSTEM_PREFIX_PATH:=${CMAKE_SYSTEM_PREFIX_PATH}
 	done
 }
@@ -379,6 +399,7 @@ update_paths () {
 
 # Main programming, running the commands in argv[]
 main_do_commands () {
+	derive_DIR
 	update_paths
 	if [ "$#" -eq 0 ]
 	then
