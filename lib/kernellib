@@ -23,7 +23,6 @@ FreeBSD\ *)
 	echo >&2 'No kernel support for FreeBSD yet'
 	exit 1
 	;;
-#TODO# Check this string
 OpenBSD\ *)
 	ostype=openbsd
 	echo >&2 'No kernel support for OpenBSD yet'

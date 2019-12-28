@@ -23,13 +23,13 @@
 # Use "uname" output to determine the packaging system,
 # possibly drilling down more if needed.
 #
-case $(uname) in
+case $(uname -a) in
 
 MSYS_NT-10.0|MSYS_NT-*)
 	PKGLIB_TYPE=msys
 	;;
 
-OpenBSD)
+OpenBSD\ )
 	PKGLIB_TYPE=openbsd
 	;;
 
