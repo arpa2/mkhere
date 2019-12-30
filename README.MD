@@ -140,6 +140,32 @@ this path.  Include it into your package's configuration and export as an
 environment variable, for instance.
 
 
+## Inclusion into "mkroot"
+
+You can use "mkhere" as a stand-alone solution to building (foreign)
+software packages.  Most often however, you will want to build up a
+root file system.  The ["mkroot"](https://github.com/arpa2/mkroot)
+package was built as a perfect match to "mkhere":
+
+  * The concern in "mkhere" is to have self-contained build roots,
+    possibly on another operating system.  The build root serves
+    as a cache of packages built, and an oracle from which the
+    concrete files can be extracted with a plethora of useful
+    little commands.  These extractions can be made mostly
+    self-contained, by automatic harvesting of dependencies.
+
+  * The concern in "mkroot" is to compose root file systems with
+    embellishments to run them in a great diversity of ways.  The
+    options include disk-based booting with GRUB, LILO, RedBoot
+    and U-Boot, but also CDROM and USB booting with ISOLINUX, and
+    network booting with PXE.  Most interestingly however, the
+    [Open Containers](http://opencontainers.org) specification has
+    standardised on a root file system plus a manifest `config.json`
+    as the standard format for (Linux-based) containers.  There
+    will be many tools for build such structures, but "mkroot" may
+    well be the coolest, thanks to its orthogonal use of "mkhere".
+
+
 ## Operating System Libraries
 
 It is possible to retrieve
