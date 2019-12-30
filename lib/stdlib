@@ -218,7 +218,7 @@ _mkset () {
 # Find OS libraries from the build system that are needed for a package
 do2_oslibs () {
 	LIBDIRS=$(
-		cat /etc/ld.so.conf /etc/ld.so.conf.d/* | \
+		cat 2>/dev/null /etc/ld.so.conf /etc/ld.so.conf.d/* | \
 		sed -e 's/#.*$//' -e '/^[ \t]*$/d' -e '/^include[ \t].*/d'
 	)
 	# First, list all software (of the requested flavour)
@@ -229,11 +229,13 @@ do2_oslibs () {
 		do
 			if [ -f "$DIR_TREE/$FILE" -a -x "$DIR_TREE/$FILE" ]
 			then
-				ldd "$DIR_TREE/$FILE" | \
+				REFDIR=$( dirname "$FILE" | sed 's+/+\\/+g' )
+				ldd 2>/dev/null "$DIR_TREE/$FILE" | \
 					sed \
 						-e 's/^[ \t]*//' \
 						-e 's/ .*//' \
-						-e '/^linux-vdso\.so.*/d' | \
+						-e '/^linux-vdso\.so.*/d' \
+						-e 's/^\([^/]*\)$/'"$REFDIR"'\/\1/' | \
 					unique
 			fi
 		done
@@ -251,23 +253,26 @@ do2_oslibs () {
 		do
 			# If $LIBNAME is an existing full path, use it
 			# This is used for /lib/ld-linux.so.2 and similar
-			if [ -r "$LIBNAME" ]
+			if [ "${LIBNAME:0:1}" = "/" ]
 			then
-				EXTREFS+=( "$LIBNAME" )
-				NEWREFS+=( $(basename "$LIBNAME") )
-				continue
+				if [ -r "$LIBNAME" ]
+				then
+					debug "Full path removed from \"$LIBNAME\""
+					EXTREFS+=( "$LIBNAME" )
+					NEWREFS+=( $(basename "$LIBNAME") )
+					continue
+				fi
 			fi
-			#TODO# Consider searching /tree for dependent pkgs too?
 			for LIBFILE in $( find 2>/dev/null "$DIR_TREE" $LIBDIRS -follow -type f -name "$LIBNAME" )
 			do
-				#DEBUG# echo "Looking into $LIBNAME => $LIBFILE"
+				debug "Looking into $LIBNAME => $LIBFILE"
 				case "$LIBFILE" in
 				# References to our own package are installed,
 				# but they may lead to further references in
 				# the base system.  For this reason, do not
 				# mention but traverse them recursively.
-				$DIR_TREE/*)
-					# echo >&2 DEBUG: Internal $LIBFILE
+				${DIR_TREE}/*)
+					debug Internal $LIBFILE
 					NEWREFS+=( "$LIBNAME" )
 					;;
 				# References to other packages may be dropped.
@@ -275,20 +280,21 @@ do2_oslibs () {
 				# will be installed by the caller anyway.
 				# This is hoping that flavours will be okay.
 				${ALTCACHE}/tree/*)
-					# echo >&2 DEBUG: Peer $LIBFILE
+					debug Peer $LIBFILE
 					;;
 				# References to the base system are mentioned.
 				# In addition, they may hold references to
 				# other libraries in the base system.  For this
 				# reason, traverse them recursively.
 				*)
-					# echo >&2 DEBUG: External $LIBFILE
+					debug External $LIBFILE
 					EXTREFS+=( "$LIBFILE" )
 					NEWREFS+=( "$LIBNAME" )
 					;;
 				esac
 			done
 		done
+		# Let ADDREFS be those NEWREFS not yet in REFLIBS
 		NEWREFS=( $( _mkset ${REFLIBS[@]} ${NEWREFS[@]} ) )
 		ADDREFS=( ${NEWREFS[@]:${#REFLIBS[@]}} )
 	done
@@ -297,11 +303,16 @@ do2_oslibs () {
 	ALLFILES=()
 	for FILE in ${EXTREFS[@]}
 	do
+		debug External reference $FILE
 		echo "${FILE#/}"
 		# ls -l "$FILE"
 		while [ -L "$FILE" ]
 		do
-			FILE=$(readlink -f "$FILE")
+			REFDIR=$(dirname "$FILE")
+			NEWFILE=$(readlink "$FILE")
+			NEWDIR=$( cd $(dirname "$FILE") ; pwd )
+			FILE=${NEWDIR%/}/$(basename "$NEWFILE")
+			debug "Link \"$FILE\" -> \"$NEWFILE\" -> \"$FILE\""
 			echo "${FILE#/}"
 			# ls -l "$FILE"
 		done

@@ -34,7 +34,12 @@ OpenBSD\ )
 	;;
 
 *)
-	PKGLIB_TYPE=debian
+	if [ -r /etc/openwrt_release ]
+	then
+		PKGLIB_TYPE=openwrt
+	else
+		PKGLIB_TYPE=debian
+	fi
 	;;
 
 esac
@@ -144,6 +149,31 @@ then
 
 	pkg_update() {
 		pkg_add -u
+	}
+
+fi
+
+
+
+
+#
+# OpenWRT packages
+#
+
+if [ $PKGLIB_TYPE == openwrt ]
+then
+
+	pkg_install() {
+		opkg install "$@"
+	}
+
+	pkg_listfiles() {
+		opkg files "$1"
+	}
+
+	pkg_update() {
+		opkg update && \
+		opkg upgrade $( opkg list-installed | sed 's/ .*//' )
 	}
 
 fi
