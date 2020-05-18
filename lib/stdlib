@@ -199,7 +199,7 @@ do_cpiogzprefix () {
 do_have () {
 	for DEP in $(do_dependencies)
 	do
-		/mkhere/$DEP.sh have
+		${ALTCACHE}/mkhere/$DEP.sh have
 		EXITCODE=$?
 		[ $EXITCODE -ne 0 ] && exit $EXITCODE
 	done
