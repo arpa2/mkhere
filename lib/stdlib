@@ -158,7 +158,7 @@ do_osdepend () {
 do_depend () {
 	for DEP in $(do_dependencies)
 	do
-		/mkhere/$DEP.sh check
+		${ALTCACHE}/mkhere/$DEP.sh check
 		EXITCODE=$?
 		[ $EXITCODE -ne 0 ] && exit $EXITCODE
 	done
