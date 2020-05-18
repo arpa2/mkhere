@@ -407,7 +407,7 @@ do_build () {
 	rm -f "${ALTCACHE}/tree/${TARGET}"
 	if [ $RETVAL -eq 0 ]
 	then
-		ln -s "${DIR_TREE}" "${ALTCACHE}/tree/${TARGET}"
+		ln -s $(basename "$DIR_TREE") $(dirname "$DIR_TREE")/"$TARGET"
 	fi
 	return $RETVAL
 }
@@ -427,8 +427,8 @@ update_paths () {
 		PATH="$PATH:${ALTCACHE}/tree/$DEPEND/usr/bin:${ALTCACHE}/tree/$DEPEND/usr/local/bin"
 		LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}${ALTCACHE}/tree/$DEPEND/usr/lib:${ALTCACHE}/tree/$DEPEND/usr/local/lib"
 		# GCC: CPATH, LIBRARY_PATH, see https://gcc.gnu.org/onlinedocs/gcc/Environment-Variables.html
-		CPATH="${CPATH:+$CPATH:}${ALTCACHE}/tree/$DEPEND/usr/include:${ALTCACHE}/tree/$DEPEND/usr/local/include"
-		LIBRARY_PATH="${LIBRARY_PATH:+$LIBRARY_PATH:}${ALTCACHE}/tree/$DEPEND/usr/lib:${ALTCACHE}/tree/$DEPEND/usr/local/lib"
+		export CPATH="${CPATH:+$CPATH:}${ALTCACHE}/tree/$DEPEND/usr/include:${ALTCACHE}/tree/$DEPEND/usr/local/include"
+		export LIBRARY_PATH="${LIBRARY_PATH:+$LIBRARY_PATH:}${ALTCACHE}/tree/$DEPEND/usr/lib:${ALTCACHE}/tree/$DEPEND/usr/local/lib"
 		# CMake: CMAKE_SYSTEM_PREFIX_PATH
 		CMAKE_SYSTEM_PREFIX_PATH="${CMAKE_SYSTEM_PREFIX_PATH:+$CMAKE_SYSTEM_PREFIX_PATH\;}${ALTCACHE}/tree/$DEPEND/usr\;${ALTCACHE}/tree/$DEPEND/usr/local"
 	done

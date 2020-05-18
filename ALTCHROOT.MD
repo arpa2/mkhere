@@ -29,6 +29,7 @@ shell command:
   * The `stdout` stream must be preserved as-is, as it may deliver a package
   * The `stderr` stream should be preserved, and may report building errors
   * Mixed-up output on `stdout` is never acceptable; use `stderr` for messages
+  * Exported environment variables must be inherited
   * Batch-mode operation is acceptable, so `stdout` may be buffered somewhere
 
 
