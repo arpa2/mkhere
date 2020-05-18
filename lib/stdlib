@@ -52,12 +52,19 @@ then
 	export $VERSION_TARGET
 	export $VARIANT_TARGET
 	export $FLAVOUR_TARGET
+	# Consider alternatives for the chroot command
+	if [ -x "$ALTCACHE/mkhere/lib/altchroot" ]
+	then
+		CHROOT="$ALTCACHE/mkhere/lib/altchroot"
+	else
+		CHROOT='chroot'
+	fi
 	# Support for last command being "install"
 	if [ "${!#}" = "install" ]
 	then
 		set -- "${@:1:$(($#-1))}"   # Drop last word from $@
 		# Install after after running the command to form cpio archive
-		chroot "$NEWROOT" "$ALTCACHE/mkhere/$TARGET.sh" "$@" | \
+		"$CHROOT" "$NEWROOT" "$ALTCACHE/mkhere/$TARGET.sh" "$@" | \
 			cpio -i \
 				--no-absolute-filenames \
 				--make-directories \
@@ -66,7 +73,7 @@ then
 		exit $?
 	else
 		# No install -- just run the command
-		exec chroot "$NEWROOT" "$ALTCACHE/mkhere/$TARGET.sh" "$@"
+		exec "$CHROOT" "$NEWROOT" "$ALTCACHE/mkhere/$TARGET.sh" "$@"
 	fi
 fi
 
