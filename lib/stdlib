@@ -16,7 +16,7 @@ fi
 
 # Find the name of an alternative to everything in root
 # Usage: ln -s /var/cache/mkhere-altcache lib/altcache
-ALTCACHE=$(readlink $(dirname "$0")"/lib/altcache" || echo '')
+ALTCACHE="$(readlink $(dirname "$0")"/lib/altcache" || echo '')"
 debug "Loaded ALTCACHE=\"$ALTCACHE\" from $(dirname "$0")/lib/altcache"
 
 # Derive $TARGET and ensure its rootfs
@@ -83,11 +83,11 @@ strip_cpio_trailer () {
 
 # Derive DIR_SRC, DIR_GIT, DIR_BUILD, DIR_TREE and have them
 derive_DIR () {
-	DIR_FETCH=${ALTCACHE}/dl/${TARGET}-${VERSION}
-	DIR_SRC=${ALTCACHE}/src/${TARGET}-${VERSION}
-	DIR_GIT=${DIR_SRC}/${TARGET}-${VERSION}.git
-	DIR_BUILD=${ALTCACHE}/build/${TARGET}-${VERSION}${VARIANT:+-${VARIANT}}
-	DIR_TREE=${ALTCACHE}/tree/${TARGET}-${VERSION}${VARIANT:+-${VARIANT}}
+	DIR_FETCH="${ALTCACHE}/dl/${TARGET}-${VERSION}"
+	DIR_SRC="${ALTCACHE}/src/${TARGET}-${VERSION}"
+	DIR_GIT="${DIR_SRC}/${TARGET}-${VERSION}.git"
+	DIR_BUILD="${ALTCACHE}/build/${TARGET}-${VERSION}${VARIANT:+-${VARIANT}}"
+	DIR_TREE="${ALTCACHE}/tree/${TARGET}-${VERSION}${VARIANT:+-${VARIANT}}"
 	mkdir -p "${DIR_TREE}" "${DIR_BUILD}" "${DIR_SRC}" "${DIR_FETCH}"
 }
 
@@ -416,13 +416,13 @@ update_paths () {
 	for DEPEND in $(do_dependencies)
 	do
 		# Runtime: PATH, LD_LIBRARY_PATH
-		PATH=$PATH:${ALTCACHE}/tree/$DEPEND/usr/bin:${ALTCACHE}/tree/$DEPEND/usr/local/bin
-		LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}${ALTCACHE}/tree/$DEPEND/usr/lib:${ALTCACHE}/tree/$DEPEND/usr/local/lib
+		PATH="$PATH:${ALTCACHE}/tree/$DEPEND/usr/bin:${ALTCACHE}/tree/$DEPEND/usr/local/bin"
+		LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}${ALTCACHE}/tree/$DEPEND/usr/lib:${ALTCACHE}/tree/$DEPEND/usr/local/lib"
 		# GCC: CPATH, LIBRARY_PATH, see https://gcc.gnu.org/onlinedocs/gcc/Environment-Variables.html
-		CPATH=${CPATH:+$CPATH:}${ALTCACHE}/tree/$DEPEND/usr/include:${ALTCACHE}/tree/$DEPEND/usr/local/include
-		LIBRARY_PATH=${LIBRARY_PATH:+$LIBRARY_PATH:}${ALTCACHE}/tree/$DEPEND/usr/lib:${ALTCACHE}/tree/$DEPEND/usr/local/lib
+		CPATH="${CPATH:+$CPATH:}${ALTCACHE}/tree/$DEPEND/usr/include:${ALTCACHE}/tree/$DEPEND/usr/local/include"
+		LIBRARY_PATH="${LIBRARY_PATH:+$LIBRARY_PATH:}${ALTCACHE}/tree/$DEPEND/usr/lib:${ALTCACHE}/tree/$DEPEND/usr/local/lib"
 		# CMake: CMAKE_SYSTEM_PREFIX_PATH
-		CMAKE_SYSTEM_PREFIX_PATH=${CMAKE_SYSTEM_PREFIX_PATH:+$CMAKE_SYSTEM_PREFIX_PATH\;}${ALTCACHE}/tree/$DEPEND/usr\;${ALTCACHE}/tree/$DEPEND/usr/local
+		CMAKE_SYSTEM_PREFIX_PATH="${CMAKE_SYSTEM_PREFIX_PATH:+$CMAKE_SYSTEM_PREFIX_PATH\;}${ALTCACHE}/tree/$DEPEND/usr\;${ALTCACHE}/tree/$DEPEND/usr/local"
 		echo CMAKE_SYSTEM_PREFIX_PATH:=${CMAKE_SYSTEM_PREFIX_PATH}
 	done
 }
