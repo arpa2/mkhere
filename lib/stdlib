@@ -89,7 +89,6 @@ then
 	ALTBIN=$(readlink -f "${ALTCACHE}/mkhere/lib/altbin" || echo '')
 	PATH="$ALTBIN:$PATH"
 fi
-echo "PATH=$PATH"
 
 # Strip the TRAILER last line for cpio archives
 strip_cpio_trailer () {
