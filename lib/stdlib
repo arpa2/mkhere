@@ -83,6 +83,14 @@ VARIANT=${!VARIANT_TARGET}
 FLAVOUR=${!FLAVOUR_TARGET}
 debug Script target is $TARGET, version is $VERSION, variant is $VARIANT, flavour is $FLAVOUR
 
+# Prepend an "alternative binary dir" to the $PATH
+if [ -r "${ALTCACHE}/mkhere/lib/altbin" ]
+then
+	ALTBIN=$(readlink -f "${ALTCACHE}/mkhere/lib/altbin" || echo '')
+	PATH="$ALTBIN:$PATH"
+fi
+echo "PATH=$PATH"
+
 # Strip the TRAILER last line for cpio archives
 strip_cpio_trailer () {
 	sed '$s/07070100000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000B00000000TRAILER!!!\(\x00\)*$//'
