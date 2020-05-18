@@ -50,32 +50,39 @@ esac
 #
 unset pkg_xlate
 declare -A pkg_xlate
-if [ -r $(dirname "$0")/xlate/$PKGLIB_TYPE ]
+#TODO# Quoting the inner "$0" and outer path appears to be impossible
+#TODO# Also ok is: if [ -r $(dirname "$0")/xlate/$PKGLIB_TYPE ]
+if [ -r "$(dirname $0)/xlate/$PKGLIB_TYPE" ]
 then
-	cat $(dirname "$0")/xlate/$PKGLIB_TYPE |
 	while read KEY SUBSTITUTES
 	do
 		pkg_xlate["$KEY"]="$SUBSTITUTES"
-	done
+	done < "$(dirname $0)/xlate/$PKGLIB_TYPE"
 fi
 #
-OUTPUT=()
-for PKG in "$@"
-do
-	if $PKG in pkg_xlate
+pkg_install () {
+	OUTPUT=()
+	for PKG in "$@"
+	do
+		if [ -n "${pkg_xlate[$PKG]}" ]
+		then
+			# Deliberately not quoted to allow multiple
+			OUTPUT+=( ${pkg_xlate[$PKG]} )
+		else
+			OUTPUT+=( $PKG )
+		fi
+	done
+	if [ ${#OUTPUT} -gt 0 ]
 	then
-		OUTPUT+=( $pkg_xlate[$PKG] )
-	else
-		OUTPUT+=( $PKG )
+		pkg2_install "${OUTPUT[@]}"
 	fi
-done
-set -- $OUTPUT
+}
 
 
 #
 # Obliged functions to implement:
 #
-# pkg_install x y z --> install packages named x, y and z.
+# pkg2_install x y z --> install packages named x, y and z.  (Called from pkg_install.)
 # pkg_listfiles x --> list files in package named x.
 # pkg_update --> update all OS packages.
 #
@@ -89,7 +96,7 @@ set -- $OUTPUT
 if [ $PKGLIB_TYPE = debian ]
 then
 
-	pkg_install() {
+	pkg2_install() {
 		apt -y install "$@"
 	}
 
@@ -111,7 +118,7 @@ fi
 if [ $PKGLIB_TYPE == msys ]
 then
 
-	pkg_install() {
+	pkg2_install() {
 		ARGV=()
 		for ARGI in "$@"
 		do
@@ -139,7 +146,7 @@ fi
 if [ $PKGLIB_TYPE == openbsd ]
 then
 
-	pkg_install() {
+	pkg2_install() {
 		pkg_add "$@"
 	}
 
@@ -163,7 +170,7 @@ fi
 if [ $PKGLIB_TYPE == openwrt ]
 then
 
-	pkg_install() {
+	pkg2_install() {
 		opkg install "$@"
 	}
 
