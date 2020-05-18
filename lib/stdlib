@@ -151,10 +151,11 @@ do_osdepend () {
 do_depend () {
 	for DEP in $(do_dependencies)
 	do
-		/mkhere/$DEP check
+		/mkhere/$DEP.sh check
 		EXITCODE=$?
 		[ $EXITCODE -ne 0 ] && exit $EXITCODE
 	done
+	return 0
 }
 
 # Generic do_tar, based on do_list
@@ -430,7 +431,6 @@ update_paths () {
 		LIBRARY_PATH="${LIBRARY_PATH:+$LIBRARY_PATH:}${ALTCACHE}/tree/$DEPEND/usr/lib:${ALTCACHE}/tree/$DEPEND/usr/local/lib"
 		# CMake: CMAKE_SYSTEM_PREFIX_PATH
 		CMAKE_SYSTEM_PREFIX_PATH="${CMAKE_SYSTEM_PREFIX_PATH:+$CMAKE_SYSTEM_PREFIX_PATH\;}${ALTCACHE}/tree/$DEPEND/usr\;${ALTCACHE}/tree/$DEPEND/usr/local"
-		echo CMAKE_SYSTEM_PREFIX_PATH:=${CMAKE_SYSTEM_PREFIX_PATH}
 	done
 }
 

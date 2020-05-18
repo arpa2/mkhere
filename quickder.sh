@@ -15,11 +15,12 @@ do_update () {
 
 do_dependencies () {
 	echo arpa2cm
-	VERSION_arpa2cm=0.8.0
 }
 
 do_osdependencies () {
 	echo python3
+	echo python3-dev
+	echo python3-setuptools
 }
 
 do2_build () {
