@@ -119,6 +119,13 @@ do_osupdate () {
 	find /build/ospackages* -name mkhere-osdeps-*.txt -exec rm {} \;
 }
 
+# The extra command for setting up mkhere
+do_ossetup () {
+	. $(dirname "$0")/lib/pkglib
+	pkg_install build-essential git cmake wget pkg-config bison flex autoconf automake libtool gdbserver gdb
+}
+
+
 main_do_commands "$@"
 
 

@@ -4,7 +4,7 @@
 
 . $(dirname "$0")/lib/stdlib
 
-default_VERSION version-0.7
+default_VERSION v0.8.0
 
 do_update () {
 	cd "$DIR_SRC"

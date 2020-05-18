@@ -184,7 +184,7 @@ do_cpiogzprefix () {
 do_have () {
 	for DEP in $(do_dependencies)
 	do
-		/mkhere/$DEP have
+		/mkhere/$DEP.sh have
 		EXITCODE=$?
 		[ $EXITCODE -ne 0 ] && exit $EXITCODE
 	done
@@ -389,19 +389,39 @@ do_build () {
 	if do_check
 	then
 		echo 'Reusing build, as it postdates the source'
+		RETVAL=0
 	else
 		rm -f "$DIR_BUILD/mkhere-oslibs.txt"
 		do2_build
+		RETVAL=$?
 	fi
+	# Mark the last successful build as the default build
+	rm -f "${ALTCACHE}/tree/${TARGET}"
+	if [ $RETVAL -eq 0 ]
+	then
+		ln -s "${DIR_TREE}" "${ALTCACHE}/tree/${TARGET}"
+	fi
+	return $RETVAL
 }
 
 
 # Derive additional PATH info for various applications
+#
+# This uses the default builds, that is the last successful build,
+# which indirectly incorporates the VERSION_pkg and FLAVOUR_pkg at
+# the time of building.  See do_build() for the link assuring this.
+# There is no support for mixing multiple versions of one package!
+#
 update_paths () {
 	for DEPEND in $(do_dependencies)
 	do
-		PATH=$PATH:${ALTCACHE}/tree/$DEPEND/bin
-		LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}${ALTCACHE}/tree/$DEPEND/usr/lib:${ALTCACHE}/tree/$DEPEND:/usr/local/lib
+		# Runtime: PATH, LD_LIBRARY_PATH
+		PATH=$PATH:${ALTCACHE}/tree/$DEPEND/usr/bin:${ALTCACHE}/tree/$DEPEND/usr/local/bin
+		LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}${ALTCACHE}/tree/$DEPEND/usr/lib:${ALTCACHE}/tree/$DEPEND/usr/local/lib
+		# GCC: CPATH, LIBRARY_PATH, see https://gcc.gnu.org/onlinedocs/gcc/Environment-Variables.html
+		CPATH=${CPATH:+$CPATH:}${ALTCACHE}/tree/$DEPEND/usr/include:${ALTCACHE}/tree/$DEPEND/usr/local/include
+		LIBRARY_PATH=${LIBRARY_PATH:+$LIBRARY_PATH:}${ALTCACHE}/tree/$DEPEND/usr/lib:${ALTCACHE}/tree/$DEPEND/usr/local/lib
+		# CMake: CMAKE_SYSTEM_PREFIX_PATH
 		CMAKE_SYSTEM_PREFIX_PATH=${CMAKE_SYSTEM_PREFIX_PATH:+$CMAKE_SYSTEM_PREFIX_PATH\;}${ALTCACHE}/tree/$DEPEND/usr\;${ALTCACHE}/tree/$DEPEND/usr/local
 		echo CMAKE_SYSTEM_PREFIX_PATH:=${CMAKE_SYSTEM_PREFIX_PATH}
 	done

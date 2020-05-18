@@ -9,12 +9,13 @@ default_VERSION version-1.3.0
 do_update () {
 	cd "$DIR_SRC"
 	empty_dir
-	git clone https://github.com/vanrein/quick-der "$DIR_GIT"
+	git clone https://gitlab.com/arpa2/quick-der "$DIR_GIT"
 	cd "$DIR_GIT" ; git reset $VERSION
 }
 
 do_dependencies () {
-	echo -n ''
+	echo arpa2cm
+	VERSION_arpa2cm=0.8.0
 }
 
 do_osdependencies () {
