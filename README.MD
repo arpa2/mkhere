@@ -56,11 +56,13 @@ either one or multiple:
     `oslib` pack of libraries from the underlying operating system,
     also output on file descriptor `&3` for CPIO, and `&4` for TAR.
   * It is possible to generate multiple CPIO archives and have their
-    outcomes appended.  The inner logic of "mkhere" will automatically
-    strip the trailer and append it at the end.  This even works for
-    GZIP versions of CPIO archives, but you cannot mix gzipped and
-    non-gzipped content, though, as you still need to pass the
-    concatenated result through a gunzipper.
+    outcomes appended in the single `&3` string.  The inner logic of
+    "mkhere" will automatically strip the trailer and append it at
+    the end.  This even works for GZIP versions of CPIO archives,
+    but you cannot mix gzipped and non-gzipped content, though, as
+    you still need to pass the concatenated result through a
+    gunzipper.  Similarly, multiple TAR archives or TGZ archives can
+    be requested, and will be delivered to `&4` as one whole.
   * `install` can only be the last command.  It will be run in the
     environment outside `chroot`, and lap up file descriptor `&3`
     from the inside of `chroot` where it should be produced by the

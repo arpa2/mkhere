@@ -114,6 +114,26 @@ write_cpio_trailer () {
 	esac
 }
 
+# Strip the end-of-file marking zero blocks from tar balls
+strip_tape_trailer () {
+	sed -E 's/\x00{512}*$//'
+}
+
+# Send the end-of-file marking zero blocks after tar balls
+write_tape_trailer () {
+	debug "Sending \"$1\" end marker for tar balls"
+	case "$1" in
+	plain)
+		dd status=none if=/dev/zero bs=512 count=4        >&4
+		;;
+	gzip)
+		dd status=none if=/dev/zero bs=512 count=4 | gzip >&4
+		;;
+	none)
+		;;
+	esac
+}
+
 # Derive DIR_SRC, DIR_GIT, DIR_BUILD, DIR_TREE and have them
 derive_DIR () {
 	DIR_FETCH="${ALTCACHE}/dl/${TARGET}-${VERSION}"
@@ -186,12 +206,14 @@ do_depend () {
 
 # Generic do_tar, based on do_list
 do_tar () {
-	( cd "$DIR_TREE" ; tar -cf - $(do_list) ) >&4
+	( cd "$DIR_TREE" ; tar -cf - $(do_list) ) | strip_tape_trailer >&4
+	TAPE_APPEND_TRAILER=plain
 }
 
 # Generic do_tgz, based on do_tar, do_list
 do_tgz () {
 	do_tar 4>&1 | gzip --best >&4
+	TAPE_APPEND_TRAILER=gzip
 }
 
 # Generic do_cpio, based on do_list
@@ -208,12 +230,7 @@ do_cpiogz () {
 
 # If not yet downloaded, fetch a first source code update
 do_have () {
-	for DEP in $(do_dependencies)
-	do
-		${ALTCACHE}/mkhere/$DEP.sh have
-		EXITCODE=$?
-		[ $EXITCODE -ne 0 ] && exit $EXITCODE
-	done
+	do_depend && \
 	if [ $(ls -1 "$DIR_SRC" | wc -l) -eq 0 ]
 	then
 		do_update
@@ -358,12 +375,14 @@ do_oslibs () {
 # Construct a tar ball with os libs
 #TODO# Maybe use this in a flavour, later on
 do_oslibtar () {
-	( cd / ; tar -cf - $(do_oslibs) ) >&4
+	( cd / ; tar -cf - $(do_oslibs) ) | strip_tape_trailer >&4
+	TAPE_APPEND_TRAILER=plain
 }
 
 # Construct a gzipped tar ball with os libs
 do_oslibtgz () {
 	do_oslibtar 4>&1 | gzip --best >&4
+	TAPE_APPEND_TRAILER=gzip
 }
 
 # Construct a cpio archive with os libs (perhaps after cpioprefix)
@@ -455,6 +474,7 @@ main_do_commands () {
 		exit 1
 	fi
 	CPIO_APPEND_TRAILER=none
+	TAPE_APPEND_TRAILER=none
 	for TODO in "$@"
 	do
 		"do_$TODO"
@@ -467,5 +487,6 @@ main_do_commands () {
 		fi
 	done
 	write_cpio_trailer $CPIO_APPEND_TRAILER
+	write_tape_trailer $TAPE_APPEND_TRAILER
 	debug "Success from subcommands $@"
 }
