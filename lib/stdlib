@@ -134,7 +134,8 @@ write_tape_trailer () {
 	esac
 }
 
-# Derive DIR_SRC, DIR_GIT, DIR_BUILD, DIR_TREE and have them
+# Derive DIR_SRC, DIR_GIT, DIR_BUILD, DIR_TREE and have them.
+# In addition, LNK_TREE is the DIR_TREE before default_VERSION is setup.
 derive_DIR () {
 	DIR_FETCH="${ALTCACHE}/dl/${TARGET}-${VERSION}"
 	DIR_SRC="${ALTCACHE}/src/${TARGET}-${VERSION}"
@@ -143,6 +144,7 @@ derive_DIR () {
 	DIR_TREE="${ALTCACHE}/tree/${TARGET}-${VERSION}${VARIANT:+-${VARIANT}}"
 	mkdir -p "${DIR_TREE}" "${DIR_BUILD}" "${DIR_SRC}" "${DIR_FETCH}"
 }
+LNK_TREE="${ALTCACHE}/tree/${TARGET}-${VERSION}${VARIANT:+-${VARIANT}}"
 
 # Setup a default VERSION, VARIANT, TARGET; called from /mkhere/$TARGET.sh
 default_VERSION() {
@@ -432,11 +434,14 @@ do_build () {
 		do2_build
 		RETVAL=$?
 	fi
-	# Mark the last successful build as the default build
-	rm -f "${ALTCACHE}/tree/${TARGET}"
-	if [ $RETVAL -eq 0 ]
+	# Possibly mark the build as a default-version/variant build
+	if [ "${LNK_TREE}" != "${DIR_TREE}" ]
 	then
-		ln -s $(basename "$DIR_TREE") $(dirname "$DIR_TREE")/"$TARGET"
+		rm -f "${LNK_TREE}"
+		if [ $RETVAL -eq 0 ]
+		then
+			ln -s $(basename "${DIR_TREE}") "${LNK_TREE}"
+		fi
 	fi
 	return $RETVAL
 }
@@ -444,22 +449,28 @@ do_build () {
 
 # Derive additional PATH info for various applications
 #
-# This uses the default builds, that is the last successful build,
-# which indirectly incorporates the VERSION_pkg and FLAVOUR_pkg at
-# the time of building.  See do_build() for the link assuring this.
-# There is no support for mixing multiple versions of one package!
+# This uses the VERSION_pkg and FLAVOUR_pkg settings for each of
+# the pkg dependencies.  Note that chroot retains exported variables,
+# and the same is required by the ALTCHROOT.MD documentation.
 #
 update_paths () {
 	for DEPEND in $(do_dependencies)
 	do
+		DEPVAR_VERSION="VERSION_${DEPEND}"
+		DEPVAR_VARIANT="VARIANT_${DEPEND}"
+		DEPVAL_VERSION=${!DEPVAR_VERSION}
+		DEPVAL_VARIANT=${!DEPVAR_VARIANT}
+		DEPDIR_TREE="${ALTCACHE}/tree/${DEPEND}-${DEPVAL_VERSION}${DEPVAL_VARIANT:+-${DEPVAL_VARIANT}}"
+		debug DEPDIR_TREE=${DEPDIR_TREE}
 		# Runtime: PATH, LD_LIBRARY_PATH
-		PATH="$PATH:${ALTCACHE}/tree/$DEPEND/usr/bin:${ALTCACHE}/tree/$DEPEND/usr/local/bin"
-		LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}${ALTCACHE}/tree/$DEPEND/usr/lib:${ALTCACHE}/tree/$DEPEND/usr/local/lib"
+		PATH="$PATH:${DEPDIR_TREE}/usr/bin:${DEPDIR_TREE}/usr/local/bin"
+		LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}${DEPDIR_TREE}/usr/lib:${DEPDIR_TREE}/usr/local/lib"
 		# GCC: CPATH, LIBRARY_PATH, see https://gcc.gnu.org/onlinedocs/gcc/Environment-Variables.html
-		export CPATH="${CPATH:+$CPATH:}${ALTCACHE}/tree/$DEPEND/usr/include:${ALTCACHE}/tree/$DEPEND/usr/local/include"
-		export LIBRARY_PATH="${LIBRARY_PATH:+$LIBRARY_PATH:}${ALTCACHE}/tree/$DEPEND/usr/lib:${ALTCACHE}/tree/$DEPEND/usr/local/lib"
+		export CPATH="${CPATH:+$CPATH:}${DEPDIR_TREE}/usr/include:${DEPDIR_TREE}/usr/local/include"
+		export LIBRARY_PATH="${LIBRARY_PATH:+$LIBRARY_PATH:}${DEPDIR_TREE}/usr/lib:${DEPDIR_TREE}/usr/local/lib"
 		# CMake: CMAKE_SYSTEM_PREFIX_PATH
-		CMAKE_SYSTEM_PREFIX_PATH="${CMAKE_SYSTEM_PREFIX_PATH:+$CMAKE_SYSTEM_PREFIX_PATH\;}${ALTCACHE}/tree/$DEPEND/usr\;${ALTCACHE}/tree/$DEPEND/usr/local"
+		CMAKE_SYSTEM_PREFIX_PATH="${CMAKE_SYSTEM_PREFIX_PATH:+$CMAKE_SYSTEM_PREFIX_PATH\;}${DEPDIR_TREE}/usr\;${DEPDIR_TREE}/usr/local"
+		debug CMAKE_SYSTEM_PREFIX_PATH=${CMAKE_SYSTEM_PREFIX_PATH}
 	done
 }
 
