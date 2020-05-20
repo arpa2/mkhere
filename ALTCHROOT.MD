@@ -26,9 +26,9 @@ shell command:
   * The directory, command and arguments are proper strings and may contain spaces
   * The intended root directory should hold the `/mkhere` or `${ALTCACHE}/mkhere` tree
   * The command will be one of the `/mkhere/pkg.sh` scripts
-  * The `stdout` stream must be preserved as-is, as it may deliver a package
-  * The `stderr` stream should be preserved, and may report building errors
-  * Mixed-up output on `stdout` is never acceptable; use `stderr` for messages
+  * The `stdout` and `stderr` streams should be preserved, and may report info and building errors
+  * Any `&3` and `&4` streams must be preserved as-is, as they may deliver packages
+  * Logging should not be sent to `stdout` but to `stderr`, and only if `$DEBUG` is set
   * Exported environment variables must be inherited
   * Batch-mode operation is acceptable, so `stdout` may be buffered somewhere
 
