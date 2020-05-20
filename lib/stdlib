@@ -4,6 +4,9 @@
 #
 #	TARGET=xxx
 #	. $(dirname "$0")/lib/stdlib
+#
+# Packages are separately passed to &3 for which the caller
+# must create an output stream (otherwise an error follows).
 
 
 # Set debugging macros
@@ -64,7 +67,7 @@ then
 	then
 		set -- "${@:1:$(($#-1))}"   # Drop last word from $@
 		# Install after after running the command to form cpio archive
-		"$CHROOT" "$NEWROOT" "$ALTCACHE/mkhere/$TARGET.sh" "$@" | \
+		"$CHROOT" "$NEWROOT" "$ALTCACHE/mkhere/$TARGET.sh" "$@" 3>&1 1>&2 | \
 			cpio -i \
 				--no-absolute-filenames \
 				--make-directories \
@@ -101,10 +104,10 @@ write_cpio_trailer () {
 	debug "Sending \"$1\" cpio trailer"
 	case "$1" in
 	plain)
-		cpio -o -H newc --quiet < /dev/null
+		cpio -o -H newc --quiet < /dev/null        >&3
 		;;
 	gzip)
-		cpio -o -H newc --quiet < /dev/null | gzip
+		cpio -o -H newc --quiet < /dev/null | gzip >&3
 		;;
 	none)
 		;;
@@ -183,23 +186,23 @@ do_depend () {
 
 # Generic do_tar, based on do_list
 do_tar () {
-	( cd "$DIR_TREE" ; tar -cf - $(do_list) )
+	( cd "$DIR_TREE" ; tar -cf - $(do_list) ) >&4
 }
 
 # Generic do_tgz, based on do_tar, do_list
 do_tgz () {
-	do_tar | gzip --best
+	do_tar 4>&1 | gzip --best >&4
 }
 
 # Generic do_cpio, based on do_list
 do_cpio () {
-	do_list | ( cd "$DIR_TREE" ; cpio -o -H newc --quiet ) | strip_cpio_trailer
+	do_list | ( cd "$DIR_TREE" ; cpio -o -H newc --quiet ) | strip_cpio_trailer >&3
 	CPIO_APPEND_TRAILER=plain
 }
 
 # Generic do_cpiogz, based on do_cpio, do_list
 do_cpiogz () {
-	do_cpio | gzip --best
+	do_cpio 3>&1 | gzip --best >&3
 	CPIO_APPEND_TRAILER=gzip
 }
 
@@ -355,23 +358,23 @@ do_oslibs () {
 # Construct a tar ball with os libs
 #TODO# Maybe use this in a flavour, later on
 do_oslibtar () {
-	( cd / ; tar -cf - $(do_oslibs) )
+	( cd / ; tar -cf - $(do_oslibs) ) >&4
 }
 
 # Construct a gzipped tar ball with os libs
 do_oslibtgz () {
-	do_oslibtar | gzip --best
+	do_oslibtar 4>&1 | gzip --best >&4
 }
 
 # Construct a cpio archive with os libs (perhaps after cpioprefix)
 do_oslibcpio () {
-	( cd / ; do_oslibs | cpio -o -H newc --quiet ) | strip_cpio_trailer
+	( cd / ; do_oslibs | cpio -o -H newc --quiet ) | strip_cpio_trailer >&3
 	CPIO_APPEND_TRAILER=plain
 }
 
 # Construct a gzipped cpio archive with os libs (perhaps after cpioprefix)
 do_oslibcpiogz () {
-	do_oslibcpio | gzip --best
+	do_oslibcpio 3>&1 | gzip --best >&3
 	CPIO_APPEND_TRAILER=gzip
 }
 

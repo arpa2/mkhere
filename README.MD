@@ -44,23 +44,28 @@ either one or multiple:
     compiled variant.  The flavour string `fff` can take any form.
   * `oslib` to list libraries from the underlying operating system
     on which the package binaries depend.
-  * `tar`, `tgz`, `cpio`, `cpiogz` export the `list` contents in a
-    requested format.  Note that the `cpio` and `cpiogz` flavours
-    are geared towards initial ram disk use; both CPIO and GZIP
-    streams can be concatenated to form larger wholes, and so can
-    Linux' initial rootfs's.  As with `list`, the `FLAVOUR_xxx=fff`
-    settings will work.
-  * `oslibtar`, `oslibtgz`, `oslibcpio`, `oslibcpiogz` export the
-    `oslib` list of libraries from the underlying operating system.
+  * `cpio`, `cpiogz`, `tar`, `tgz` export the `list` contents in a
+    requested format to file descriptor `&3` for CPIO, and `&4` for
+    for the TAR or TGZ targets.  Note that the `cpio` and `cpiogz`
+    flavours are geared towards initial ram disk use; both CPIO and
+    GZIP streams can be concatenated to form larger wholes, and so
+    can Linux' initial rootfs's; this is why CPIO is fixed on `&3`
+    while TAR archives use `&4` as output stream.  As with `list`,
+    the `FLAVOUR_xxx=fff` settings will work.
+  * `oslibcpio`, `oslibcpiogz`, `oslibtar`, `oslibtgz` export the
+    `oslib` pack of libraries from the underlying operating system,
+    also output on file descriptor `&3` for CPIO, and `&4` for TAR.
   * It is possible to generate multiple CPIO archives and have their
     outcomes appended.  The inner logic of "mkhere" will automatically
     strip the trailer and append it at the end.  This even works for
     GZIP versions of CPIO archives, but you cannot mix gzipped and
     non-gzipped content, though, as you still need to pass the
     concatenated result through a gunzipper.
-  * `install` can only be the last command.  It will be removed in
-    the `chroot` environment, and pass the output into an installer
-    for the CPIO archive, which runs in the calling directory.
+  * `install` can only be the last command.  It will be run in the
+    environment outside `chroot`, and lap up file descriptor `&3`
+    from the inside of `chroot` where it should be produced by the
+    `cpio` commands (not their GZIP counterparts).  Run the command
+    in the directory where content should be installed.
 
 Any build OS dependencies will be installed before building commences.
 This may be somewhat platform-specific.  We start off with Debian.
@@ -121,13 +126,13 @@ While working on the script containing this, if it fails, you can manually go ba
 Once you have the results built, you can export the results,
 
 ```
-FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpiogz
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpiogz 3>...
 ```
 
 You can line this up as your `initrd=` image for a kernel, or you could ask for a tar ball to unzip on the spot,
 
 ```
-FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh tar | tar -xvf -
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh tar 4>&1 | tar -xvf -
 ```
 
 It is intentional that most of the actions above constitute exactly one shell command.
@@ -186,7 +191,7 @@ To collect a package together with OS libraries, you can produce a CPIO
 archive for the package by dropping the trailer from the first archive,
 
 ```
-FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpio oslibcpio
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpio oslibcpio 3>...
 ```
 
 and you could additionally install the produced archive in the calling
