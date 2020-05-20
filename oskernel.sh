@@ -43,6 +43,10 @@ do_build () {
 		done
 }
 
+do_test () {
+	return 0;
+}
+
 do_list () {
 	kernel_files
 }

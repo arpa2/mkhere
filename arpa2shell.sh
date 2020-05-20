@@ -36,6 +36,10 @@ do2_build () {
 	python3 "$DIR_GIT/setup.py" install --root="$DIR_TREE"
 }
 
+do_test () {
+	return 0;
+}
+
 do_list () {
 	cd "$DIR_TREE"
 	#TODO# Need to be able to find...

@@ -55,6 +55,10 @@ do_build () {
 	done
 }
 
+do_test () {
+	return 0;
+}
+
 do_list () {
 	do_build
 	cd "$DIR_TREE"

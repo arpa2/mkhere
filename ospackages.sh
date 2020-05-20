@@ -53,6 +53,10 @@ do_build () {
 		done
 }
 
+do_test () {
+	return 0;
+}
+
 do_list () {
 	. $(dirname "$0")/lib/pkglib
 	for PKG in $FLAVOUR_ospackages

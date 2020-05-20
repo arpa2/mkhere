@@ -44,6 +44,10 @@ do2_build () {
 	#KEEP:DEBUG# rm "$DIR_TREE/usr/bin/"{twcuckoo,twclutter,twdialog,twthreadtest} && \
 }
 
+do_test () {
+	return 0;
+}
+
 do_list () {
 	cd "$DIR_TREE"
 	find . -type f,l | sed 's+^\./++'

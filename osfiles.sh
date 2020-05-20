@@ -50,6 +50,10 @@ do_build () {
 		done
 }
 
+do_test () {
+	return 0;
+}
+
 do_list () {
 	echo -n "$FLAVOUR_osfiles" | sed "s+//+\n+g" | \
 	while read FILEPATN

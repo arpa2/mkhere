@@ -48,6 +48,10 @@ do_build () {
 		done
 }
 
+do_test () {
+	return 0;
+}
+
 do_list () {
 	for PATN in ${FLAVOUR_osterminfo:-vt* ansi xterm*}
 	do

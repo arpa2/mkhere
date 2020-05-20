@@ -38,6 +38,7 @@ either one or multiple:
   * `check` to check that the source code has been built
   * `depend` to check that source code dependencies have been built
   * `build` to run configuration and building, as required
+  * `test` runs package-internal tests after building
   * `variants` and `flavours` list the respective room for choice.
   * `list` to list packages, possibly specific to `FLAVOUR_xxx=fff`
     which makes a consistent selection from among the `VARIANT_xxx=vvv`
@@ -104,17 +105,19 @@ And you might take the same approach to source code dependencies,
 /path/to/mkhere/xxx.sh depend
 ```
 
-However, you will always want to build automatically, but only if needed, as part of a script,
+However, you will always want to build automatically, but only if needed, as part of a script, and normally you should also consider running a test on the built binaries,
 
 ```
 /path/to/mkhere/xxx.sh build
+#OR#
+/path/to/mkhere/xxx.sh build test
 ```
 
 Note that an automated build may alternatively take care of `update` and
 `osdepend` too, in case the operator did not do it:
 
 ```
-/path/to/mkhere/xxx.sh have build
+/path/to/mkhere/xxx.sh have build test
 ```
 
 While working on the script containing this, if it fails, you can manually go back after downgrading the build, and possibly even build it on the spot,
@@ -122,7 +125,7 @@ While working on the script containing this, if it fails, you can manually go ba
 ```
 /path/to/mkhere/xxx.sh touch
 #or#
-/path/to/mkhere/xxx.sh touch build
+/path/to/mkhere/xxx.sh touch build test
 ```
 
 Once you have the results built, you can export the results,

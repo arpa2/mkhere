@@ -29,6 +29,10 @@ do_osdependencies () {
 	echo libssl-dev
 }
 
+do_test () {
+	return 0;
+}
+
 do2_build () {
 	cd "$DIR_BUILD"
 	empty_dir

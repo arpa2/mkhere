@@ -43,6 +43,11 @@ do2_build () {
 	#TODO# python3 "$DIR_GIT/setup.py" install
 }
 
+do_test () {
+	cd "$DIR_BUILD"
+	ctest
+}
+
 do_list () {
 	cd "$DIR_TREE"
 	find . -type f,l | sed 's+^\./++'
