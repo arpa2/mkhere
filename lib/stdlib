@@ -96,9 +96,19 @@ strip_cpio_trailer () {
 }
 
 # Send the TRAILER last file for cpio archives
-# Current uglyness: more block-filler zeroes than required
+# Provide "plain", "gzip" or "none" for the mode
 write_cpio_trailer () {
-	cpio -o -H newc --quiet < /dev/null
+	debug "Sending \"$1\" cpio trailer"
+	case "$1" in
+	plain)
+		cpio -o -H newc --quiet < /dev/null
+		;;
+	gzip)
+		cpio -o -H newc --quiet < /dev/null | gzip
+		;;
+	none)
+		;;
+	esac
 }
 
 # Derive DIR_SRC, DIR_GIT, DIR_BUILD, DIR_TREE and have them
@@ -184,13 +194,13 @@ do_tgz () {
 # Generic do_cpio, based on do_list
 do_cpio () {
 	do_list | ( cd "$DIR_TREE" ; cpio -o -H newc --quiet ) | strip_cpio_trailer
-	CPIO_APPEND_TRAILER=1
+	CPIO_APPEND_TRAILER=plain
 }
 
 # Generic do_cpiogz, based on do_cpio, do_list
 do_cpiogz () {
 	do_cpio | gzip --best
-	CPIO_APPEND_TRAILER=1
+	CPIO_APPEND_TRAILER=gzip
 }
 
 # If not yet downloaded, fetch a first source code update
@@ -356,13 +366,13 @@ do_oslibtgz () {
 # Construct a cpio archive with os libs (perhaps after cpioprefix)
 do_oslibcpio () {
 	( cd / ; do_oslibs | cpio -o -H newc --quiet ) | strip_cpio_trailer
-	CPIO_APPEND_TRAILER=1
+	CPIO_APPEND_TRAILER=plain
 }
 
 # Construct a gzipped cpio archive with os libs (perhaps after cpioprefix)
 do_oslibcpiogz () {
-	do_oslibcpio | gzip --best | strip_cpio_trailer
-	CPIO_APPEND_TRAILER=1
+	do_oslibcpio | gzip --best
+	CPIO_APPEND_TRAILER=gzip
 }
 
 # Refuse to install with an intermediate command
@@ -441,7 +451,7 @@ main_do_commands () {
 		echo >&2 "Please supply one or more subcommands to $0"
 		exit 1
 	fi
-	CPIO_APPEND_TRAILER=0
+	CPIO_APPEND_TRAILER=none
 	for TODO in "$@"
 	do
 		"do_$TODO"
@@ -453,9 +463,6 @@ main_do_commands () {
 			exit 1
 		fi
 	done
-	if [ $CPIO_APPEND_TRAILER -ne 0 ]
-	then
-		write_cpio_trailer
-	fi
+	write_cpio_trailer $CPIO_APPEND_TRAILER
 	debug "Success from subcommands $@"
 }
