@@ -52,15 +52,12 @@ either one or multiple:
     settings will work.
   * `oslibtar`, `oslibtgz`, `oslibcpio`, `oslibcpiogz` export the
     `oslib` list of libraries from the underlying operating system.
-  * `cpioprefix` or `oslibcpioprefix` produce a CPIO archive without
-    the trailer.  This can be used when further commands concatenate
-    files in CPIO format; only the last should not have this.
-  * There even are variants `cpiogzprefix` and `oslibcpiogzprefix`
-    that zip the CPIO archives without the trailer.  Since you can
-    concatenate GZIP files as well as using prefix CPIO archives
-    before a plain CPIO, you can concatenate gzipped archives.  You
-    cannot mix gzipped and non-gzipped content, though, as you still
-    need to pass the concatenated result through a gunzipper.
+  * It is possible to generate multiple CPIO archives and have their
+    outcomes appended.  The inner logic of "mkhere" will automatically
+    strip the trailer and append it at the end.  This even works for
+    GZIP versions of CPIO archives, but you cannot mix gzipped and
+    non-gzipped content, though, as you still need to pass the
+    concatenated result through a gunzipper.
   * `install` can only be the last command.  It will be removed in
     the `chroot` environment, and pass the output into an installer
     for the CPIO archive, which runs in the calling directory.
@@ -189,14 +186,14 @@ To collect a package together with OS libraries, you can produce a CPIO
 archive for the package by dropping the trailer from the first archive,
 
 ```
-FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpioprefix oslibcpio
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpio oslibcpio
 ```
 
 and you could additionally install the produced archive in the calling
 directory, which is usually outside the build root, with
 
 ```
-FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpioprefix oslibcpio install
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpio oslibcpio install
 ```
 
 The complete call to build and install a package with all that it
@@ -204,7 +201,7 @@ takes might be as simple as
 
 ```
 FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh osdepend depend have build
-FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpioprefix oslibcpio install
+FLAVOUR_xxx=fff /path/to/mkhere/xxx.sh cpio oslibcpio install
 ```
 
 where the separation of the commands is useful because the first
@@ -226,7 +223,7 @@ passing the packages through the flavour mechanism to a standard target,
 
 ```
 FLAVOUR_ospackages='bash gcc' /path/to/mkhere/ospackages.sh osdepend depend have build
-FLAVOUR_ospackages='bash gcc' /path/to/mkhere/ospackages.sh cpioprefix oslibcpio install
+FLAVOUR_ospackages='bash gcc' /path/to/mkhere/ospackages.sh cpio oslibcpio install
 ```
 
 Here, `osdepend` installs the packages listed in the flavour variable;
@@ -242,7 +239,7 @@ be terminated with a newline too!
 
 ```
 FLAVOUR_osfiles='/bin/bash^J/usr/bin/gcc^J' /path/to/mkhere/osfiles.sh osdepend depend have build
-FLAVOUR_osfiles='/bin/bash^J/usr/bin/gcc^J' /path/to/mkhere/osfiles.sh cpioprefix oslibcpio install
+FLAVOUR_osfiles='/bin/bash^J/usr/bin/gcc^J' /path/to/mkhere/osfiles.sh cpio oslibcpio install
 ```
 
 Again, multiple invocations are possible.  A likely form of using this is to

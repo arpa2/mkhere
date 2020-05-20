@@ -95,6 +95,12 @@ strip_cpio_trailer () {
 	sed '$s/07070100000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000B00000000TRAILER!!!\(\x00\)*$//'
 }
 
+# Send the TRAILER last file for cpio archives
+# Current uglyness: more block-filler zeroes than required
+write_cpio_trailer () {
+	cpio -o -H newc --quiet < /dev/null
+}
+
 # Derive DIR_SRC, DIR_GIT, DIR_BUILD, DIR_TREE and have them
 derive_DIR () {
 	DIR_FETCH="${ALTCACHE}/dl/${TARGET}-${VERSION}"
@@ -177,22 +183,14 @@ do_tgz () {
 
 # Generic do_cpio, based on do_list
 do_cpio () {
-	do_list | ( cd "$DIR_TREE" ; cpio -o -H newc --quiet )
-}
-
-# Generic do_cpio, but without the TRAILER in the last line
-do_cpioprefix () {
-	do_cpio | strip_cpio_trailer
+	do_list | ( cd "$DIR_TREE" ; cpio -o -H newc --quiet ) | strip_cpio_trailer
+	CPIO_APPEND_TRAILER=1
 }
 
 # Generic do_cpiogz, based on do_cpio, do_list
 do_cpiogz () {
 	do_cpio | gzip --best
-}
-
-# Generic do_cpiogz, but without the TRAILER in the last line
-do_cpiogzprefix () {
-	do_cpioprefix | gzip --best
+	CPIO_APPEND_TRAILER=1
 }
 
 # If not yet downloaded, fetch a first source code update
@@ -357,22 +355,14 @@ do_oslibtgz () {
 
 # Construct a cpio archive with os libs (perhaps after cpioprefix)
 do_oslibcpio () {
-	( cd / ; do_oslibs | cpio -o -H newc --quiet )
+	( cd / ; do_oslibs | cpio -o -H newc --quiet ) | strip_cpio_trailer
+	CPIO_APPEND_TRAILER=1
 }
 
 # Construct a gzipped cpio archive with os libs (perhaps after cpioprefix)
 do_oslibcpiogz () {
-	do_oslibcpio | gzip --best
-}
-
-# Construct a cpio archive with os libs without TRAILER last line
-do_oslibcpioprefix () {
-	do_oslibcpio | strip_cpio_trailer
-}
-
-# Construct a gzipped cpio archive with os libs without TRAILER last line
-do_oslibcpiogzprefix () {
-	do_oslibcpioprefix | gzip --best
+	do_oslibcpio | gzip --best | strip_cpio_trailer
+	CPIO_APPEND_TRAILER=1
 }
 
 # Refuse to install with an intermediate command
@@ -451,6 +441,7 @@ main_do_commands () {
 		echo >&2 "Please supply one or more subcommands to $0"
 		exit 1
 	fi
+	CPIO_APPEND_TRAILER=0
 	for TODO in "$@"
 	do
 		"do_$TODO"
@@ -462,5 +453,9 @@ main_do_commands () {
 			exit 1
 		fi
 	done
+	if [ $CPIO_APPEND_TRAILER -ne 0 ]
+	then
+		write_cpio_trailer
+	fi
 	debug "Success from subcommands $@"
 }
