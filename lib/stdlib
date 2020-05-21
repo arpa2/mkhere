@@ -19,29 +19,31 @@ fi
 
 # Find the name of an alternative to everything in root
 # Usage: ln -s /var/cache/mkhere-altcache lib/altcache
-ALTCACHE="$(readlink $(dirname "$0")"/lib/altcache" || echo '')"
-debug "Loaded ALTCACHE=\"$ALTCACHE\" from $(dirname "$0")/lib/altcache"
+ARGV0=$(readlink -f "$0")
+ALTCACHE="$(readlink $(dirname "$ARGV0")"/lib/altcache" || echo '')"
+debug "Loaded ALTCACHE=\"$ALTCACHE\" from $(dirname "$ARGV0")/lib/altcache"
 
 # Derive $TARGET and ensure its rootfs
-TARGET=$(basename "$0")
+TARGET=$(basename "$ARGV0")
 TARGET=${TARGET%.sh}
 VERSION_TARGET="VERSION_${TARGET}"
 VARIANT_TARGET="VARIANT_${TARGET}"
 FLAVOUR_TARGET="FLAVOUR_${TARGET}"
-if [ "$0" != "$ALTCACHE/mkhere/$TARGET.sh" ]
+if [ "$ARGV0" != "$ALTCACHE/mkhere/$TARGET.sh" ]
 then
 	# Find the new root directory and test it
 	if [ -z "$ALTCACHE" ]
 	then
-		NEWROOT="$(dirname "$0")/.."
+		NEWROOT=$(dirname $(dirname "$ARGV0"))
 	else
 		TRAILER="${ALTCACHE}/mkhere/${TARGET}.sh"
-		PREFIXLEN=$[${#0}-${#TRAILER}]
-		NEWROOT="${0:0:$PREFIXLEN}"
+		PREFIXLEN=$[${#ARGV0}-${#TRAILER}]
+		[ $PREFIXLEN -lt 0 ] && PREFIXLEN=0
+		NEWROOT="${ARGV0:0:$PREFIXLEN}"
 		debug "Comparing \"${0:$PREFIXLEN}\" to \"${TRAILER}\""
-		if [ ! "${0:$PREFIXLEN}" = "${TRAILER}" ]
+		if [ ! "${ARGV0:$PREFIXLEN}" = "${TRAILER}" ]
 		then
-			echo >&2 "Path \"$0\" does not have expected trailer \"${TRAILER}\""
+			echo >&2 "Path \"$ARGV0\" does not have expected trailer \"${TRAILER}\""
 			exit 1
 		fi
 	fi
@@ -176,7 +178,7 @@ empty_dir () {
 
 # Utility to print lines only when they are new (without sort)
 unique () {
-	# awk '{if(!seen[$0]++)print}'
+	# awk '{if(!seen[$ARGV0]++)print}'
 	declare -A seen
 	while read X
 	do
@@ -191,7 +193,7 @@ unique () {
 
 # Generic subcommand for installing dependencies
 do_osdepend () {
-	. $(dirname "$0")/lib/pkglib
+	. $(dirname "$ARGV0")/lib/pkglib
 	pkg_install $(do_osdependencies)
 }
 
