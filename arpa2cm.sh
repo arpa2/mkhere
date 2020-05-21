@@ -3,15 +3,11 @@
 # ARPA2CM build script
 
 . $(dirname "$0")/lib/stdlib
+. $(dirname "$0")/lib/toolgit
+
+GIT_URL="https://gitlab.com/arpa2/arpa2cm.git"
 
 default_VERSION v0.8.0
-
-do_update () {
-	cd "$DIR_SRC"
-	empty_dir
-	git clone https://gitlab.com/arpa2/arpa2cm "$DIR_GIT"
-	cd "$DIR_GIT" ; git reset $VERSION
-}
 
 do_dependencies () {
 	echo -n ''
@@ -24,7 +20,7 @@ do_osdependencies () {
 do2_build () {
 	cd "$DIR_BUILD"
 	empty_dir
-	cmake "$DIR_GIT"
+	cmake "$DIR_SRC"
 	make && \
 	empty_dir "$DIR_TREE" && \
 	make DESTDIR="$DIR_TREE" install

@@ -139,6 +139,7 @@ write_tape_trailer () {
 # Derive DIR_SRC, DIR_GIT, DIR_BUILD, DIR_TREE and have them.
 # In addition, LNK_TREE is the DIR_TREE before default_VERSION is setup.
 derive_DIR () {
+	DIR_FETCH_SHARED="${ALTCACHE}/dl/${TARGET}"
 	DIR_FETCH="${ALTCACHE}/dl/${TARGET}-${VERSION}"
 	DIR_SRC="${ALTCACHE}/src/${TARGET}-${VERSION}"
 	DIR_GIT="${DIR_SRC}/${TARGET}-${VERSION}.git"

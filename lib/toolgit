@@ -1,0 +1,33 @@
+# Git support as a general toolkit
+#
+# To use this, set GIT_URL before functions are called.
+# This defines various do2git_xxx() functions and default
+# do_xxx() functions when they are otherwise undefined.
+#
+# From: Rick van Rein <rick@openfortress.nl>
+
+
+# Create a bare repository in $DIR_FETCH without -$VERSION.
+# This will then be efficiently cloned to $DIR_SRC with -$VERSION.
+#
+do2git_update () {
+	if [ ! -r "$DIR_FETCH_SHARED/objects" ]
+	then
+		git clone --bare "$GIT_URL" "$DIR_FETCH_SHARED"
+	else
+		git -C "$DIR_FETCH_SHARED" fetch
+	fi
+	if [ ! -h "$DIR_FETCH" ]
+	then
+		rm -rf "$DIR_FETCH"
+		ln -s $(basename "$DIR_FETCH_SHARED") "$DIR_FETCH"
+	fi
+	rm -rf "$DIR_SRC"/* "$DIR_SRC"/.[^.]*
+	git clone "$DIR_FETCH_SHARED" "$DIR_SRC"
+	git -C "$DIR_SRC" reset "$VERSION"
+}
+
+type do_update >/dev/null 2>/dev/null || \
+do_update () {
+	do2git_update "$@"
+}
