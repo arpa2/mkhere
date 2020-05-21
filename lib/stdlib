@@ -147,7 +147,7 @@ derive_DIR () {
 	DIR_TREE="${ALTCACHE}/tree/${TARGET}-${VERSION}${VARIANT:+-${VARIANT}}"
 	mkdir -p "${DIR_TREE}" "${DIR_BUILD}" "${DIR_SRC}" "${DIR_FETCH}"
 }
-LNK_TREE="${ALTCACHE}/tree/${TARGET}-${VERSION}${VARIANT:+-${VARIANT}}"
+LNK_TREE="${ALTCACHE}/tree/${TARGET}${VERSION:+-${VERSION}}${VARIANT:+-${VARIANT}}"
 
 # Setup a default VERSION, VARIANT, TARGET; called from /mkhere/$TARGET.sh
 default_VERSION() {
@@ -390,13 +390,13 @@ do_oslibtgz () {
 	TAPE_APPEND_TRAILER=gzip
 }
 
-# Construct a cpio archive with os libs (perhaps after cpioprefix)
+# Construct a cpio archive with os libs (perhaps after cpio)
 do_oslibcpio () {
 	( cd / ; do_oslibs | cpio -o -H newc --quiet ) | strip_cpio_trailer >&3
 	CPIO_APPEND_TRAILER=plain
 }
 
-# Construct a gzipped cpio archive with os libs (perhaps after cpioprefix)
+# Construct a gzipped cpio archive with os libs (perhaps after cpio)
 do_oslibcpiogz () {
 	do_oslibcpio 3>&1 | gzip --best >&3
 	CPIO_APPEND_TRAILER=gzip
@@ -463,7 +463,7 @@ update_paths () {
 		DEPVAR_VARIANT="VARIANT_${DEPEND}"
 		DEPVAL_VERSION=${!DEPVAR_VERSION}
 		DEPVAL_VARIANT=${!DEPVAR_VARIANT}
-		DEPDIR_TREE="${ALTCACHE}/tree/${DEPEND}-${DEPVAL_VERSION}${DEPVAL_VARIANT:+-${DEPVAL_VARIANT}}"
+		DEPDIR_TREE="${ALTCACHE}/tree/${DEPEND}${DEPVAL_VERSION:+-${DEPVAL_VERSION}}${DEPVAL_VARIANT:+-${DEPVAL_VARIANT}}"
 		debug DEPDIR_TREE=${DEPDIR_TREE}
 		# Runtime: PATH, LD_LIBRARY_PATH
 		PATH="$PATH:${DEPDIR_TREE}/usr/bin:${DEPDIR_TREE}/usr/local/bin"

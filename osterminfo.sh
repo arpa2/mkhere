@@ -16,6 +16,8 @@
 
 . $(dirname "$0")/lib/stdlib
 
+default_VERSION 0.0.0
+
 do_touch () {
 	echo -n ''
 }

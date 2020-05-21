@@ -11,6 +11,8 @@
 . $(dirname "$0")/lib/stdlib
 . $(dirname "$0")/lib/kernellib
 
+default_VERSION 0.0.0
+
 do_touch () {
 	echo -n ''
 }
