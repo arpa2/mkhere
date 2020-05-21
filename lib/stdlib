@@ -413,7 +413,7 @@ type do_touch >/dev/null 2>/dev/null || \
 do_touch () {
 	if [ ! -d "$DIR_SRC" ]
 	then
-		echo >&2 "You did not \"have\" source code for $TARGET not yet"
+		echo >&2 "You did not \"have\" source code for $TARGET yet"
 		exit 1
 	fi
 	touch "$DIR_SRC"
