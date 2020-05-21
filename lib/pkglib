@@ -50,14 +50,12 @@ esac
 #
 unset pkg_xlate
 declare -A pkg_xlate
-#TODO# Quoting the inner "$0" and outer path appears to be impossible
-#TODO# Also ok is: if [ -r $(dirname "$0")/xlate/$PKGLIB_TYPE ]
-if [ -r "$(dirname $0)/xlate/$PKGLIB_TYPE" ]
+if [ -r $(dirname "$0")"/xlate/$PKGLIB_TYPE" ]
 then
 	while read KEY SUBSTITUTES
 	do
 		pkg_xlate["$KEY"]="$SUBSTITUTES"
-	done < "$(dirname $0)/xlate/$PKGLIB_TYPE"
+	done < $(dirname "$0")"/xlate/$PKGLIB_TYPE"
 fi
 #
 pkg_install () {
@@ -85,6 +83,7 @@ pkg_install () {
 # pkg2_install x y z --> install packages named x, y and z.  (Called from pkg_install.)
 # pkg_listfiles x --> list files in package named x.
 # pkg_update --> update all OS packages.
+# pkg_dependencies --> list packages that are runtime dependencies for these packages.
 #
 
 
@@ -106,6 +105,15 @@ then
 
 	pkg_update() {
 		apt-get -y update && apt-get -y upgrade
+	}
+
+	pkg_dependencies() {
+		apt-cache depends "$@" | \
+			sed \
+				-e '/^ *Depends:/!d' \
+				-e 's/^ *Depends: *//' \
+				-e '/^<.*>$/d' | \
+			awk '{if(!seen[$0]++)print}'
 	}
 
 fi
@@ -136,6 +144,12 @@ then
 		pacman --config /etc/pacman-msys.conf -Syu
 	}
 
+	pkg_dependencies() {
+		#TODO# https://wiki.archlinux.org/index.php/Pacman#Querying_package_databases
+		# Use pactree?
+		echo >&2 'TODO: List unique runtime dependencies of many arguments'
+	}
+
 fi
 
 
@@ -156,6 +170,10 @@ then
 
 	pkg_update() {
 		pkg_add -u
+	}
+
+	pkg_dependencies() {
+		echo >&2 'TODO: List unique runtime dependencies of many arguments'
 	}
 
 fi
@@ -181,6 +199,14 @@ then
 	pkg_update() {
 		opkg update && \
 		opkg upgrade $( opkg list-installed | sed 's/ .*//' )
+	}
+
+	pkg_dependencies() {
+		opkg depends "$@" | \
+			sed \
+				-e '/^[ \t]/!d' \
+				-e 's/^[ \t]*//' | \
+			awk '{if(!seen[$0]++)print}'
 	}
 
 fi

@@ -59,7 +59,8 @@ do_test () {
 
 do_list () {
 	. $(dirname "$0")/lib/pkglib
-	for PKG in $FLAVOUR_ospackages
+	DEPS=$(pkg_dependencies $FLAVOUR_ospackages)
+	for PKG in $FLAVOUR_ospackages $DEPS
 	do
 		pkg_listfiles $PKG | \
 			while read FILE
