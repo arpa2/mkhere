@@ -4,6 +4,7 @@
 
 . $(dirname "$0")/lib/stdlib
 . $(dirname "$0")/lib/toolgit
+. $(dirname "$0")/lib/toolcmake
 
 GIT_URL="https://gitlab.com/arpa2/kip.git"
 
@@ -30,18 +31,8 @@ do_osdependencies () {
 }
 
 do2_build () {
-	cd "$DIR_BUILD"
-	empty_dir
-	cmake "$DIR_SRC"
-	make && \
-	empty_dir "$DIR_TREE" && \
-	make DESTDIR="$DIR_TREE" install #TODO# && \
+	do2cmake_build #TODO# && \
 	#TODO# python3 "$DIR_SRC/setup.py" install
-}
-
-do_test () {
-	cd "$DIR_BUILD"
-	ctest
 }
 
 do_list () {

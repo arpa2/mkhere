@@ -1,0 +1,38 @@
+# CMake general pattern toolkit
+#
+# Introduces several do2cmake_xxx() functions and, if they are
+# undefined, wrappers do_xxx() or do2_xxx() functions for them.
+#
+# From: Rick van Rein <rick@openfortress.nl>
+
+
+# Configure with CMake, source tree $DIR_SRC, build in
+# $DIR_BUILD and install in $DIR_TREE.
+#
+do2cmake_build () {
+	cd "$DIR_BUILD"
+	empty_dir
+	cmake "$DIR_SRC"
+	make && \
+	empty_dir "$DIR_TREE" &&
+	make DESTDIR="$DIR_TREE" install
+}
+#
+type do2_build >/dev/null 2>/dev/null || \
+do2_build () {
+	do2cmake_build "$@"
+}
+
+
+# Test with CTest under $DIR_BUILD.
+#
+do2cmake_test () {
+	cd "$DIR_BUILD"
+	ctest
+}
+#
+type do_test >/dev/null 2>/dev/null || \
+do_test () {
+	do2cmake_test "$@"
+}
+

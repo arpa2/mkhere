@@ -4,6 +4,7 @@
 
 . $(dirname "$0")/lib/stdlib
 . $(dirname "$0")/lib/toolgit
+. $(dirname "$0")/lib/toolcmake
 
 GIT_URL="https://gitlab.com/arpa2/arpa2cm.git"
 
@@ -17,16 +18,8 @@ do_osdependencies () {
 	echo -n ''
 }
 
-do2_build () {
-	cd "$DIR_BUILD"
-	empty_dir
-	cmake "$DIR_SRC"
-	make && \
-	empty_dir "$DIR_TREE" && \
-	make DESTDIR="$DIR_TREE" install
-}
-
 do_test () {
+	# Overrule CTest
 	return 0;
 }
 
