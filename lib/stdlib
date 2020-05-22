@@ -289,7 +289,6 @@ do2_oslibs () {
 			fi
 		done
 	) ) )
-	debug oslibs2_REFLIBS=${REFLIBS[@]}
 	# Third, mention external, and recurse on internal + external
 	EXTREFS=()
 	NEWREFS=()
@@ -359,11 +358,7 @@ do2_oslibs () {
 		while [ -L "$FILE" ]
 		do
 			REFDIR=$(dirname "$FILE")
-			#OLD# NEWFILE=$(readlink "$FILE")
-			#OLD# NEWDIR=$( cd $(dirname "$FILE") ; pwd )
-			#OLD# FILE=${NEWDIR%/}/$(basename "$NEWFILE")
 			FILE=$(readlink -f "$FILE")
-			#OLD# debug "Link \"$FILE\" -> \"$NEWFILE\" -> \"$FILE\""
 			debug "Link \"$FILE\" -> \"$FILE\""
 			echo "${FILE#/}"
 			# ls -l "$FILE"
