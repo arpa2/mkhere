@@ -30,7 +30,7 @@ In addition, it is optional but desirable to also add:
 
 You may find it pleasant to also have things like
 
-  - `ccmake-ncurses-gui`
+  - `cmake-curses-gui`
 
 This does not include package dependencies, which are installed
 with `/mkhere/xxx.sh osdepend` of course.

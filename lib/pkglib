@@ -95,6 +95,8 @@ pkg_install () {
 if [ $PKGLIB_TYPE = debian ]
 then
 
+	export DEBIAN_FRONTEND=noninteractive
+
 	pkg2_install() {
 		apt -y install "$@"
 	}

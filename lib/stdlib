@@ -281,6 +281,7 @@ do2_oslibs () {
 				ldd 2>/dev/null "$DIR_TREE/$FILE" | \
 					sed \
 						-e 's/^[ \t]*//' \
+						-e 's/^[^ ]* => *//' \
 						-e 's/ .*//' \
 						-e '/^linux-vdso\.so.*/d' \
 						-e 's/^\([^/]*\)$/'"$REFDIR"'\/\1/' | \
@@ -288,6 +289,7 @@ do2_oslibs () {
 			fi
 		done
 	) ) )
+	debug oslibs2_REFLIBS=${REFLIBS[@]}
 	# Third, mention external, and recurse on internal + external
 	EXTREFS=()
 	NEWREFS=()
@@ -357,10 +359,12 @@ do2_oslibs () {
 		while [ -L "$FILE" ]
 		do
 			REFDIR=$(dirname "$FILE")
-			NEWFILE=$(readlink "$FILE")
-			NEWDIR=$( cd $(dirname "$FILE") ; pwd )
-			FILE=${NEWDIR%/}/$(basename "$NEWFILE")
-			debug "Link \"$FILE\" -> \"$NEWFILE\" -> \"$FILE\""
+			#OLD# NEWFILE=$(readlink "$FILE")
+			#OLD# NEWDIR=$( cd $(dirname "$FILE") ; pwd )
+			#OLD# FILE=${NEWDIR%/}/$(basename "$NEWFILE")
+			FILE=$(readlink -f "$FILE")
+			#OLD# debug "Link \"$FILE\" -> \"$NEWFILE\" -> \"$FILE\""
+			debug "Link \"$FILE\" -> \"$FILE\""
 			echo "${FILE#/}"
 			# ls -l "$FILE"
 		done

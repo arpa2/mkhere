@@ -35,6 +35,10 @@ do2_build () {
 	#TODO# python3 "$DIR_SRC/setup.py" install
 }
 
+do_test () {
+	debug "TODO: Temporarily disabled KIP testing"
+}
+
 do_list () {
 	cd "$DIR_TREE"
 	find . -type f,l | sed 's+^\./++'
