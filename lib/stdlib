@@ -9,6 +9,15 @@
 # must create an output stream (otherwise an error follows).
 
 
+# Do not work any more
+echo >&2 "This repository has moved to GitLab"
+echo >&2 ""
+echo >&2 "Get \"mkhere\" from"
+echo >&2 "	https://gitlab.com/arpa2/mkhere/"
+echo >&2
+exit 1
+
+
 # Set debugging macros
 if [ -n "$DEBUG" ]
 then
